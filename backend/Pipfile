@@ -7,10 +7,9 @@ name = "pypi"
 
 [packages]
 
-django = "*"
+Django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
-django-measurement = "*"
 
 
 [dev-packages]

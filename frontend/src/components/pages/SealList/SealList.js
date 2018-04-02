@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import { Container, Header, Loader, Button } from 'semantic-ui-react';
 import Moment from 'react-moment';
 import axios from 'axios';
-import ReactTable from 'react-table';
 import { Link } from 'react-router-dom';
+import { Breadcrumb, Layout, Table } from 'antd';
 
-import 'react-table/react-table.css';
+const { Content } = Layout;
 
 class SealList extends Component {
   state = {
@@ -14,7 +13,7 @@ class SealList extends Component {
 
   async componentDidMount() {
     try {
-      const response = await axios.get('/api/seal');
+      const response = await axios.get('/api/seal/');
       this.setState({
         seals: response.data,
       });
@@ -26,30 +25,32 @@ class SealList extends Component {
   render() {
     const columns = [
       {
-        Header: 'Name',
-        accessor: 'name',
+        title: 'Name',
+        dataIndex: 'name',
       },
       {
-        Header: 'Updated At',
-        accessor: 'updated_at',
-        Cell: props => <Moment date={props.value} />,
+        title: 'Updated At',
+        dataIndex: 'updated_at',
+        render: timestamp => <Moment date={timestamp} />,
+      },
+      {
+        title: 'Action',
+        dataIndex: 'id',
+        render: id => <Link to={`/seal/${id}/edit`}>Edit</Link>,
       },
     ];
 
     return (
-      <Container text style={{ marginTop: '7em' }}>
-        <Header as="h1">Seals</Header>
-        <ReactTable
-          data={this.state.seals}
-          columns={columns}
-          minRows={0}
-          loading={this.state.seals.length === 0}
-          loadingText={<Loader active />}
-          noDataText=""
-          PreviousComponent={Button}
-          NextComponent={Button}
-        />
-      </Container>
+      <Content style={{ padding: '0 50px' }}>
+        <Breadcrumb style={{ margin: '16px 0' }}>
+          <Breadcrumb.Item>Home</Breadcrumb.Item>
+          <Breadcrumb.Item>List</Breadcrumb.Item>
+          <Breadcrumb.Item>App</Breadcrumb.Item>
+        </Breadcrumb>
+        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+          <Table columns={columns} dataSource={this.state.seals} rowKey="id" />
+        </div>
+      </Content>
     );
   }
 }

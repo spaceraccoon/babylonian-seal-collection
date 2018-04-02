@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "c774fbdb100daac004a134ef3770857fa48d6c504d0c633ccaeb810caac11ae0"
+            "sha256": "79c474408d3d669d1055dcf080d1ae9f82f507ceb9e35d4659bddb0b545b7e27"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -24,13 +24,6 @@
             "index": "pypi",
             "version": "==2.0.3"
         },
-        "django-appconf": {
-            "hashes": [
-                "sha256:6a4d9aea683b4c224d97ab8ee11ad2d29a37072c0c6c509896dd9857466fb261",
-                "sha256:ddab987d14b26731352c01ee69c090a4ebfc9141ed223bef039d79587f22acd9"
-            ],
-            "version": "==1.0.2"
-        },
         "django-cors-headers": {
             "hashes": [
                 "sha256:0e9532628b3aa8806442d4d0b15e56112e6cfbef3735e13401935c98b842a2b4",
@@ -39,13 +32,6 @@
             "index": "pypi",
             "version": "==2.2.0"
         },
-        "django-measurement": {
-            "hashes": [
-                "sha256:a499b19d652235f1ec10c346cf0a5debe821e78a990cc595a4020778f0e85a6b"
-            ],
-            "index": "pypi",
-            "version": "==3.0.0"
-        },
         "djangorestframework": {
             "hashes": [
                 "sha256:1f6baf40ed456ed2af6bd1a4ff8bbc3503cebea16509993aea2b7085bc097766",
@@ -53,18 +39,6 @@
             ],
             "index": "pypi",
             "version": "==3.7.7"
-        },
-        "measurement": {
-            "hashes": [
-                "sha256:36ca385ffdccf140a75a7e1d816a4df97a6dd255f16fd2f53dd7ab43632a8835"
-            ],
-            "version": "==2.0.1"
-        },
-        "mpmath": {
-            "hashes": [
-                "sha256:04d14803b6875fe6d69e6dccea87d5ae5599802e4b1df7997bddd2024001050c"
-            ],
-            "version": "==1.0.0"
         },
         "pytz": {
             "hashes": [
@@ -79,19 +53,6 @@
                 "sha256:f93ddcdd6342f94cea379c73cddb5724e0d6d0a1c91c9bdef364dc0368ba4fda"
             ],
             "version": "==2018.3"
-        },
-        "six": {
-            "hashes": [
-                "sha256:70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",
-                "sha256:832dc0e10feb1aa2c68dcc57dbb658f1c7e65b9b61af69048abc87a2db00a0eb"
-            ],
-            "version": "==1.11.0"
-        },
-        "sympy": {
-            "hashes": [
-                "sha256:ac5b57691bc43919dcc21167660a57cc51797c28a4301a6144eff07b751216a4"
-            ],
-            "version": "==1.1.1"
         }
     },
     "develop": {

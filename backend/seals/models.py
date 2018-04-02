@@ -1,13 +1,12 @@
 from django.db import models
-from django_measurement.models import MeasurementField
-from measurement.measures import Distance, Weight
+
 
 class Seal(models.Model):
     # metadata
     # created_by
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     # identification
     name = models.CharField(max_length=255)
     cdli_number = models.CharField(blank=True, max_length=255)
@@ -17,11 +16,11 @@ class Seal(models.Model):
     collection = models.CharField(blank=True, max_length=255)
 
     # physical
-    height = MeasurementField(blank=True, null=True, measurement=Distance)
-    thickness = MeasurementField(blank=True, null=True, measurement=Distance)
-    width = MeasurementField(blank=True, null=True, measurement=Distance)
-    weight = MeasurementField(blank=True, null=True, measurement=Weight)
-    drill_hole_diameter = MeasurementField(blank=True, null=True, measurement=Distance)
+    height = models.FloatField(blank=True, null=True)
+    thickness = models.FloatField(blank=True, null=True)
+    width = models.FloatField(blank=True, null=True)
+    weight = models.FloatField(blank=True, null=True)
+    drill_hole_diameter = models.FloatField(blank=True, null=True)
     perforations = models.CharField(blank=True, max_length=255)
 
     # material
@@ -74,7 +73,7 @@ class Seal(models.Model):
     )
     design_remarks = models.TextField(blank=True)
     # scene
-    # artistic_style 
+    # artistic_style
     # iconographic_elements
 
     # images
