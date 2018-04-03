@@ -2,8 +2,6 @@ import React, { Component } from 'react';
 import { withRouter, Redirect } from 'react-router-dom';
 import { Breadcrumb, Col, Form, Layout, Row, Tabs } from 'antd';
 
-import { createUser } from '../../../api/userApi';
-import { signIn } from '../../../api/sessionApi';
 import SignInForm from './SignInForm/SignInForm';
 import './SignIn.css';
 
