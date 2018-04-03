@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from . import views
 
+
 urlpatterns = [
     path('seal/', views.ListSeal.as_view()),
     path('seal/<int:pk>/', views.DetailSeal.as_view()),
