@@ -1,7 +1,16 @@
 import React, { Component, Fragment } from 'react';
 import axios from 'axios';
 import _ from 'lodash';
-import { Button, Form, Input, InputNumber, Select, Slider, Switch } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Select,
+  Slider,
+  Switch,
+} from 'antd';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -39,14 +48,20 @@ class SealForm extends Component {
       e.preventDefault();
       this.props.form.validateFields(async (err, values) => {
         if (!err) {
-          let response = this.props.seal
-            ? await axios.patch(`/api/seal/${this.props.seal.id}/`, values)
-            : await axios.post('/api/seal/', values);
-          console.log(response);
+          if (this.props.seal) {
+            await axios.patch(`/api/seal/${this.props.seal.id}/`, values);
+            message.success(<Fragment>Updated seal.</Fragment>);
+          } else {
+            await axios.post('/api/seal/', values);
+            message.success(<Fragment>Created seal.</Fragment>);
+          }
+        } else {
+          message.error('Invalid data. Please check form fields.');
         }
       });
     } catch (e) {
       console.error(e);
+      message.error('Failed to update seal.');
     }
   };
 

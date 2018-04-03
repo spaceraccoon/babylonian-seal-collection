@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import Moment from 'react-moment';
+import _ from 'lodash';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Layout, Table } from 'antd';
+import { Breadcrumb, Divider, Layout, message, Popconfirm, Table } from 'antd';
 
 const { Content } = Layout;
 
@@ -17,6 +18,7 @@ class SealList extends Component {
       this.setState({
         seals: response.data,
       });
+      console.log(this.state.seals);
     } catch (e) {
       console.error(e);
     }
@@ -36,7 +38,35 @@ class SealList extends Component {
       {
         title: 'Action',
         dataIndex: 'id',
-        render: id => <Link to={`/seal/${id}/edit`}>Edit</Link>,
+        render: id => (
+          <Fragment>
+            <Link to={`/seal/${id}`}>View</Link>
+            <Divider type="vertical" />
+            <Link to={`/seal/${id}/edit`}>Edit</Link>
+            <Divider type="vertical" />
+            <Popconfirm
+              title="Are you sure？"
+              onConfirm={async () => {
+                try {
+                  await axios.delete(`/api/seal/${id}`);
+                  this.setState({
+                    seals: _.filter(this.state.seals, seal => {
+                      return seal.id !== id;
+                    }),
+                  });
+                  message.success('Deleted seal.');
+                } catch (e) {
+                  console.error(e);
+                  message.error('Failed to delete seal.');
+                }
+              }}
+              okText="Yes"
+              cancelText="No"
+            >
+              <a>Delete</a>
+            </Popconfirm>
+          </Fragment>
+        ),
       },
     ];
 
