@@ -1,4 +1,5 @@
 {
+  "cacheDirectories": ["frontend/node_modules"],
   "engines": {
     "node": "8.11.1",
     "yarn": "1.3.2"

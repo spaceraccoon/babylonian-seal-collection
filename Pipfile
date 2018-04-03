@@ -13,6 +13,7 @@ django-cors-headers = "*"
 djangorestframework-simplejwt = "*"
 gunicorn = "*"
 whitenoise = "*"
+dj-database-url = "*"
 
 
 [dev-packages]
