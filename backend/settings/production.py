@@ -1,4 +1,4 @@
-from backend.seals.settings.common import *
+from backend.settings.common import *
 import os
 
 SECRET_KEY = os.environ['SECRET_KEY']
