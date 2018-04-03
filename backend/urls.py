@@ -16,9 +16,19 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('backend.seals.urls')),
+    path(
+        'favicon.ico',
+        RedirectView.as_view(url=staticfiles_storage.url('favicon.ico'))
+    ),
+    path(
+        'manifest.json',
+        RedirectView.as_view(url=staticfiles_storage.url('manifest.json'))
+    ),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]
