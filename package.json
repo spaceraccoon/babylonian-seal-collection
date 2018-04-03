@@ -3,5 +3,5 @@
     "node": "8.11.1",
     "yarn": "1.3.2"
   },
-  "postinstall": "cd frontend && yarn && yarn build"
+  "heroku-postbuild": "cd frontend && yarn && yarn build"
 }
