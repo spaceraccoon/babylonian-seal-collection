@@ -1,0 +1,25 @@
+.signin-card-container > .ant-tabs-card > .ant-tabs-content {
+  margin-top: -16px;
+}
+
+.signin-card-container
+  > .ant-tabs-card
+  > .ant-tabs-content
+  > .ant-tabs-tabpane {
+  background: #fff;
+  padding: 16px;
+}
+
+.signin-card-container > .ant-tabs-card > .ant-tabs-bar {
+  border-color: #fff;
+}
+
+.signin-card-container > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab {
+  border-color: transparent;
+  background: transparent;
+}
+
+.signin-card-container > .ant-tabs-card > .ant-tabs-bar .ant-tabs-tab-active {
+  border-color: #fff;
+  background: #fff;
+}

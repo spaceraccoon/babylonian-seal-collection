@@ -1,9 +1,10 @@
 import React, { Component, Fragment } from 'react';
 import Moment from 'react-moment';
 import _ from 'lodash';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Divider, Layout, message, Popconfirm, Table } from 'antd';
+import { Breadcrumb, Divider, Layout, Popconfirm, Table } from 'antd';
+
+import { fetchSeals, deleteSeal } from '../../../api/sealApi';
 
 const { Content } = Layout;
 
@@ -13,15 +14,9 @@ class SealList extends Component {
   };
 
   async componentDidMount() {
-    try {
-      const response = await axios.get('/api/seal/');
-      this.setState({
-        seals: response.data,
-      });
-      console.log(this.state.seals);
-    } catch (e) {
-      console.error(e);
-    }
+    this.setState({
+      seals: await fetchSeals(),
+    });
   }
 
   render() {
@@ -31,6 +26,10 @@ class SealList extends Component {
         dataIndex: 'name',
       },
       {
+        title: 'Creator',
+        dataIndex: 'creator_username',
+      },
+      {
         title: 'Updated At',
         dataIndex: 'updated_at',
         render: timestamp => <Moment date={timestamp} />,
@@ -38,35 +37,36 @@ class SealList extends Component {
       {
         title: 'Action',
         dataIndex: 'id',
-        render: id => (
-          <Fragment>
-            <Link to={`/seal/${id}`}>View</Link>
-            <Divider type="vertical" />
-            <Link to={`/seal/${id}/edit`}>Edit</Link>
-            <Divider type="vertical" />
-            <Popconfirm
-              title="Are you sure？"
-              onConfirm={async () => {
-                try {
-                  await axios.delete(`/api/seal/${id}`);
-                  this.setState({
-                    seals: _.filter(this.state.seals, seal => {
-                      return seal.id !== id;
-                    }),
-                  });
-                  message.success('Deleted seal.');
-                } catch (e) {
-                  console.error(e);
-                  message.error('Failed to delete seal.');
-                }
-              }}
-              okText="Yes"
-              cancelText="No"
-            >
-              <a>Delete</a>
-            </Popconfirm>
-          </Fragment>
-        ),
+        render: (id, seal) => {
+          return (
+            <Fragment>
+              <Link to={`/seal/${id}`}>View</Link>
+              {seal.is_creator && (
+                <Fragment>
+                  <Divider type="vertical" />
+                  <Link to={`/seal/${id}/edit`}>Edit</Link>
+                  <Divider type="vertical" />
+                  <Popconfirm
+                    title="Are you sure？"
+                    onConfirm={async () => {
+                      if (await deleteSeal(id)) {
+                        this.setState({
+                          seals: _.filter(this.state.seals, seal => {
+                            return seal.id !== id;
+                          }),
+                        });
+                      }
+                    }}
+                    okText="Yes"
+                    cancelText="No"
+                  >
+                    <a>Delete</a>
+                  </Popconfirm>
+                </Fragment>
+              )}
+            </Fragment>
+          );
+        },
       },
     ];
 

@@ -3,7 +3,8 @@ from django.db import models
 
 class Seal(models.Model):
     # metadata
-    # created_by
+    creator = models.ForeignKey(
+        'auth.User', related_name='seals', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

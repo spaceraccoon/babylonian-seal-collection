@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import axios from 'axios';
-// import { Link } from 'react-router-dom';
 import { Breadcrumb, Layout } from 'antd';
 
 import SealForm from '../../common/SealForm/SealForm';
+import { fetchSeal } from '../../../api/sealApi';
 
 const { Content } = Layout;
 
@@ -13,16 +12,9 @@ class SealEdit extends Component {
   };
 
   async componentDidMount() {
-    try {
-      const response = await axios.get(
-        `/api/seal/${this.props.match.params.id}`
-      );
-      this.setState({
-        seal: response.data,
-      });
-    } catch (e) {
-      console.error(e);
-    }
+    this.setState({
+      seal: await fetchSeal(this.props.match.params.id),
+    });
   }
 
   render() {

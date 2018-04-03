@@ -1,5 +1,4 @@
 import React, { Component, Fragment } from 'react';
-import axios from 'axios';
 import _ from 'lodash';
 import {
   Button,
@@ -12,12 +11,11 @@ import {
   Switch,
 } from 'antd';
 
+import { createSeal, updateSeal } from '../../../api/sealApi';
+
 const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
-
-axios.defaults.xsrfCookieName = 'csrftoken';
-axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 
 const formItemLayout = {
   labelCol: {
@@ -44,25 +42,18 @@ const tailFormItemLayout = {
 
 class SealForm extends Component {
   handleSubmit = e => {
-    try {
-      e.preventDefault();
-      this.props.form.validateFields(async (err, values) => {
-        if (!err) {
-          if (this.props.seal) {
-            await axios.patch(`/api/seal/${this.props.seal.id}/`, values);
-            message.success(<Fragment>Updated seal.</Fragment>);
-          } else {
-            await axios.post('/api/seal/', values);
-            message.success(<Fragment>Created seal.</Fragment>);
-          }
+    e.preventDefault();
+    this.props.form.validateFields(async (err, values) => {
+      if (!err) {
+        if (this.props.seal) {
+          await updateSeal(this.props.seal.id, values);
         } else {
-          message.error('Invalid data. Please check form fields.');
+          await createSeal(values);
         }
-      });
-    } catch (e) {
-      console.error(e);
-      message.error('Failed to update seal.');
-    }
+      } else {
+        message.error('Invalid data. Please check form fields.');
+      }
+    });
   };
 
   render() {
@@ -263,13 +254,11 @@ class SealForm extends Component {
 const WrappedSealForm = Form.create({
   mapPropsToFields(props) {
     if (props.seal) {
-      console.log(props.seal);
       let newFields = _.mapValues(props.seal, field => {
         return Form.createFormField({
           value: field,
         });
       });
-      console.log(newFields);
       return newFields;
     } else {
       return;
