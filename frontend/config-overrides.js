@@ -6,7 +6,9 @@ module.exports = function override(config, env) {
     ['import', { libraryName: 'antd', style: true }],
     config
   );
-  config = injectBabelPlugin('transform-remove-console', config);
+  if (process.env.NODE_ENV === 'production') {
+    config = injectBabelPlugin('transform-remove-console', config);
+  }
   config = rewireLess.withLoaderOptions({ modifyVars: {} })(config, env);
   return config;
 };
