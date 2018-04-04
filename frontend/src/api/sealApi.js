@@ -36,7 +36,7 @@ const createSeal = async seal => {
 
 const fetchSeal = async id => {
   try {
-    const { data } = await axios.get(`/api/seal/${id}`);
+    const { data } = await axios.get(`/api/seal/${id}/`);
     return data;
   } catch (error) {
     console.error(error);
@@ -68,7 +68,7 @@ const updateSeal = async (id, seal) => {
 
 const deleteSeal = async (id, callback) => {
   try {
-    await await axios.delete(`/api/seal/${id}`);
+    await await axios.delete(`/api/seal/${id}/`);
     message.success('Deleted seal.');
     return true;
   } catch (error) {

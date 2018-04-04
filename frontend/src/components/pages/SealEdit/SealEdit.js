@@ -12,6 +12,7 @@ class SealEdit extends Component {
   };
 
   async componentDidMount() {
+    console.log(await fetchSeal(this.props.match.params.id));
     this.setState({
       seal: await fetchSeal(this.props.match.params.id),
     });
