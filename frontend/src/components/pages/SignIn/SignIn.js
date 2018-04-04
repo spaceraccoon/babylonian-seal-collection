@@ -32,7 +32,7 @@ class SignIn extends Component {
             lg={{ span: 8, offset: 8 }}
           >
             <Tabs type="card">
-              <TabPane tab="Sign Up" key="1">
+              <TabPane tab="Sign In" key="1">
                 <SignInForm setState={this.setState.bind(this)} />
               </TabPane>
               <TabPane tab="Register" key="2">

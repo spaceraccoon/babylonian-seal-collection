@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Layout, Menu } from 'antd';
 
 import { signOut } from '../../../api/sessionApi';
@@ -7,11 +7,6 @@ import { signOut } from '../../../api/sessionApi';
 const { Header } = Layout;
 
 class Navigation extends Component {
-  handleSignOut() {
-    signOut();
-    this.props.history.push('/');
-  }
-
   render() {
     return (
       <Header>
@@ -29,7 +24,9 @@ class Navigation extends Component {
           </Menu.Item>
           {localStorage.accessToken ? (
             <Menu.Item key="3" style={{ float: 'right' }}>
-              <a onClick={this.handleSignOut.bind(this)}>Sign Out</a>
+              <a href="/" onClick={signOut}>
+                Sign Out
+              </a>
             </Menu.Item>
           ) : (
             <Menu.Item key="3" style={{ float: 'right' }}>
@@ -42,4 +39,4 @@ class Navigation extends Component {
   }
 }
 
-export default withRouter(Navigation);
+export default Navigation;

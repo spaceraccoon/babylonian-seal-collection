@@ -10,11 +10,13 @@ const { Content } = Layout;
 
 class SealList extends Component {
   state = {
+    isLoading: true,
     seals: [],
   };
 
   async componentDidMount() {
     this.setState({
+      isLoading: false,
       seals: await fetchSeals(),
     });
   }
@@ -78,7 +80,12 @@ class SealList extends Component {
           <Breadcrumb.Item>App</Breadcrumb.Item>
         </Breadcrumb>
         <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-          <Table columns={columns} dataSource={this.state.seals} rowKey="id" />
+          <Table
+            columns={columns}
+            dataSource={this.state.seals}
+            loading={this.state.isLoading}
+            rowKey="id"
+          />
         </div>
       </Content>
     );
