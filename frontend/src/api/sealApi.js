@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { message } from 'antd';
 
+import getHeaders from '../utils/getHeaders';
+
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
 axios.interceptors.response.use(
@@ -16,7 +18,6 @@ axios.interceptors.response.use(
         refresh: localStorage.getItem('refreshToken'),
       });
       localStorage.setItem('accessToken', data.access);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
       originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
       return axios(originalRequest);
     }
@@ -26,7 +27,7 @@ axios.interceptors.response.use(
 
 const createSeal = async seal => {
   try {
-    await axios.post('/api/seal/', seal);
+    await axios.post('/api/seal/', seal, getHeaders());
     message.success('Created seal.');
   } catch (error) {
     console.error(error);
@@ -36,7 +37,7 @@ const createSeal = async seal => {
 
 const fetchSeal = async id => {
   try {
-    const { data } = await axios.get(`/api/seal/${id}/`);
+    const { data } = await axios.get(`/api/seal/${id}/`, getHeaders());
     return data;
   } catch (error) {
     console.error(error);
@@ -47,7 +48,7 @@ const fetchSeal = async id => {
 
 const fetchSeals = async () => {
   try {
-    const { data } = await axios.get('/api/seal/');
+    const { data } = await axios.get('/api/seal/', getHeaders());
     return data;
   } catch (error) {
     console.error(error);
@@ -58,7 +59,7 @@ const fetchSeals = async () => {
 
 const updateSeal = async (id, seal) => {
   try {
-    await axios.patch(`/api/seal/${id}/`, seal);
+    await axios.patch(`/api/seal/${id}/`, seal, getHeaders());
     message.success('Updated seal.');
   } catch (error) {
     console.error(error);
@@ -68,7 +69,7 @@ const updateSeal = async (id, seal) => {
 
 const deleteSeal = async (id, callback) => {
   try {
-    await await axios.delete(`/api/seal/${id}/`);
+    await await axios.delete(`/api/seal/${id}/`, getHeaders());
     message.success('Deleted seal.');
     return true;
   } catch (error) {
