@@ -10,6 +10,7 @@ import {
   Slider,
   Switch,
 } from 'antd';
+import { Redirect } from 'react-router-dom';
 
 import { createSeal, updateSeal } from '../../../api/sealApi';
 
@@ -41,14 +42,22 @@ const tailFormItemLayout = {
 };
 
 class SealForm extends Component {
+  state = {
+    seal: null,
+  };
+
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
         if (this.props.seal) {
-          await updateSeal(this.props.seal.id, values);
+          this.setState({
+            seal: await updateSeal(this.props.seal.id, values),
+          });
         } else {
-          await createSeal(values);
+          this.setState({
+            seal: await createSeal(values),
+          });
         }
       } else {
         message.error('Invalid data. Please check form fields.');
@@ -59,7 +68,9 @@ class SealForm extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
 
-    return (
+    return this.state.seal ? (
+      <Redirect to={`/seal/${this.state.seal.id}`} />
+    ) : (
       <Form onSubmit={this.handleSubmit}>
         <h2>Identification</h2>
         <FormItem {...formItemLayout} label="Name">

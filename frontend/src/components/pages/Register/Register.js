@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Link, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { Breadcrumb, Button, Form, Icon, Input, Layout } from 'antd';
 
 import { signIn } from '../../../api/sessionApi';
@@ -84,4 +84,4 @@ class Register extends Component {
 
 const WrappedRegister = Form.create()(Register);
 
-export default withRouter(WrappedRegister);
+export default WrappedRegister;

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { withRouter, Redirect } from 'react-router-dom';
+import { Redirect } from 'react-router-dom';
 import { Breadcrumb, Col, Form, Layout, Row, Tabs } from 'antd';
 
 import SignInForm from './SignInForm/SignInForm';
@@ -48,4 +48,4 @@ class SignIn extends Component {
 
 const WrappedSignIn = Form.create()(SignIn);
 
-export default withRouter(WrappedSignIn);
+export default WrappedSignIn;

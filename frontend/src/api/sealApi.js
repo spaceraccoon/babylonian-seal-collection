@@ -27,11 +27,13 @@ axios.interceptors.response.use(
 
 const createSeal = async seal => {
   try {
-    await axios.post('/api/seal/', seal, getHeaders());
+    let { data } = await axios.post('/api/seal/', seal, getHeaders());
     message.success('Created seal.');
+    return data;
   } catch (error) {
     console.error(error);
     message.error('Invalid data. Please check form fields.');
+    return null;
   }
 };
 
@@ -59,11 +61,13 @@ const fetchSeals = async () => {
 
 const updateSeal = async (id, seal) => {
   try {
-    await axios.patch(`/api/seal/${id}/`, seal, getHeaders());
+    let { data } = await axios.patch(`/api/seal/${id}/`, seal, getHeaders());
     message.success('Updated seal.');
+    return data;
   } catch (error) {
     console.error(error);
     message.error('Invalid data. Please check form fields.');
+    return null;
   }
 };
 
