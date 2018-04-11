@@ -18,9 +18,14 @@ from django.urls import include, path, re_path
 from django.views.generic import TemplateView
 from django.views.generic.base import RedirectView
 from django.contrib.staticfiles.storage import staticfiles_storage
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('backend.seals.urls')),
+    path('api/seal/', include('backend.apps.seals.urls')),
+    path('api/user/', include('backend.apps.users.urls')),
+    path('api/material/', include('backend.apps.materials.urls')),
+    path('api/auth/token/obtain/', TokenObtainPairView.as_view()),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view()),
     re_path('.*', TemplateView.as_view(template_name='index.html')),
 ]

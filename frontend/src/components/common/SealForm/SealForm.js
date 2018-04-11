@@ -1,31 +1,24 @@
 import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  message,
-  Select,
-  Slider,
-  Switch,
-} from 'antd';
+import { Button, Form, Input, InputNumber, message, Radio, Select } from 'antd';
 import { Redirect } from 'react-router-dom';
 
 import { createSeal, updateSeal } from '../../../api/sealApi';
+import { fetchMaterials } from '../../../api/materialApi';
 
 const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
+const RadioGroup = Radio.Group;
 
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    sm: { span: 3 },
+    lg: { span: 3 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    sm: { span: 10 },
+    lg: { span: 10 },
   },
 };
 
@@ -34,7 +27,7 @@ const tailFormItemLayout = {
     xs: {
       span: 24,
     },
-    sm: {
+    lg: {
       span: 16,
       offset: 3,
     },
@@ -44,12 +37,20 @@ const tailFormItemLayout = {
 class SealForm extends Component {
   state = {
     seal: null,
+    materials: [],
   };
 
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
+        if (values.materials) {
+          values.materials = values.materials.map(material => {
+            return {
+              name: material,
+            };
+          });
+        }
         if (this.props.seal) {
           this.setState({
             seal: await updateSeal(this.props.seal.id, values),
@@ -64,6 +65,12 @@ class SealForm extends Component {
       }
     });
   };
+
+  async componentDidMount() {
+    this.setState({
+      materials: await fetchMaterials(),
+    });
+  }
 
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -200,21 +207,43 @@ class SealForm extends Component {
             ],
           })(<Input />)}
         </FormItem>
+        <FormItem {...formItemLayout} label="Materials">
+          {getFieldDecorator('materials', {})(
+            <Select
+              mode="tags"
+              style={{ width: '100%' }}
+              tokenSeparators={[',']}
+            >
+              {this.state.materials.map(material => {
+                return (
+                  <Option key={material.id} value={material.name}>
+                    {material.name}
+                  </Option>
+                );
+              })}
+            </Select>
+          )}
+        </FormItem>
         <FormItem {...formItemLayout} label="Surface Preservation">
           {getFieldDecorator('surface_preservation')(
-            <Slider
-              max={3}
-              marks={{ 0: 'Poor', 1: 'Fair', 2: 'Good', 3: 'Excellent' }}
-              tipFormatter={null}
-              dots
-            />
+            <Select>
+              <Option value={0}>Poor</Option>
+              <Option value={1}>Fair</Option>
+              <Option value={2}>Good</Option>
+              <Option value={3}>Excellent</Option>
+            </Select>
           )}
         </FormItem>
         <FormItem {...formItemLayout} label="Condition">
           {getFieldDecorator('condition')(<TextArea rows={4} />)}
         </FormItem>
         <FormItem {...formItemLayout} label="Is Recarved">
-          {getFieldDecorator('is_recarved')(<Switch />)}
+          {getFieldDecorator('is_recarved')(
+            <RadioGroup>
+              <Radio value={true}>True</Radio>
+              <Radio value={false}>False</Radio>
+            </RadioGroup>
+          )}
         </FormItem>
         <FormItem {...formItemLayout} label="Physical Remarks">
           {getFieldDecorator('physical_remarks')(<TextArea rows={4} />)}
@@ -265,7 +294,12 @@ class SealForm extends Component {
 const WrappedSealForm = Form.create({
   mapPropsToFields(props) {
     if (props.seal) {
-      let newFields = _.mapValues(props.seal, field => {
+      let newFields = _.mapValues(props.seal, (field, key) => {
+        if (key === 'materials') {
+          return Form.createFormField({
+            value: field.map(material => material.name),
+          });
+        }
         return Form.createFormField({
           value: field,
         });

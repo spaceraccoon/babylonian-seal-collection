@@ -28,7 +28,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'backend.seals',
+    'backend.apps.seals',
+    'backend.apps.users',
+    'backend.apps.materials',
 ]
 
 REST_FRAMEWORK = {

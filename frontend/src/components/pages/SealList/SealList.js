@@ -2,11 +2,9 @@ import React, { Component, Fragment } from 'react';
 import Moment from 'react-moment';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Breadcrumb, Divider, Layout, Popconfirm, Table } from 'antd';
+import { Divider, Popconfirm, Table } from 'antd';
 
 import { fetchSeals, deleteSeal } from '../../../api/sealApi';
-
-const { Content } = Layout;
 
 class SealList extends Component {
   state = {
@@ -43,7 +41,7 @@ class SealList extends Component {
           return (
             <Fragment>
               <Link to={`/seal/${id}`}>View</Link>
-              {seal.is_creator && (
+              {seal.can_edit && (
                 <Fragment>
                   <Divider type="vertical" />
                   <Link to={`/seal/${id}/edit`}>Edit</Link>
@@ -73,21 +71,14 @@ class SealList extends Component {
     ];
 
     return (
-      <Content style={{ padding: '0 50px' }}>
-        <Breadcrumb style={{ margin: '16px 0' }}>
-          <Breadcrumb.Item>Home</Breadcrumb.Item>
-          <Breadcrumb.Item>List</Breadcrumb.Item>
-          <Breadcrumb.Item>App</Breadcrumb.Item>
-        </Breadcrumb>
-        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-          <Table
-            columns={columns}
-            dataSource={this.state.seals}
-            loading={this.state.isLoading}
-            rowKey="id"
-          />
-        </div>
-      </Content>
+      <div className="content-body">
+        <Table
+          columns={columns}
+          dataSource={this.state.seals}
+          loading={this.state.isLoading}
+          rowKey="id"
+        />
+      </div>
     );
   }
 }

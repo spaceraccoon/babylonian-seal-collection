@@ -1,7 +1,7 @@
 from rest_framework import permissions
 
 
-class IsCreatorOrReadOnly(permissions.BasePermission):
+class IsCreatorOrAdminOrReadOnly(permissions.BasePermission):
     """
     Custom permission to only allow creators of an object to edit it.
     """
@@ -13,4 +13,4 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
             return True
 
         # Write permissions are only allowed to the creator of the snippet.
-        return obj.creator == request.user
+        return obj.creator == request.user or request.user.is_staff or request.user.is_superuser

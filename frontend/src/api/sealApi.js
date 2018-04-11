@@ -9,17 +9,19 @@ axios.interceptors.response.use(
   response => {
     return response;
   },
-  async error => {
+  error => {
     const originalRequest = error.config;
-
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const { data } = await axios.post('/api/auth/token/refresh/', {
-        refresh: localStorage.getItem('refreshToken'),
-      });
-      localStorage.setItem('accessToken', data.access);
-      originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
-      return axios(originalRequest);
+      return axios
+        .post('/api/auth/token/refresh/', {
+          refresh: localStorage.getItem('refreshToken'),
+        })
+        .then(({ data }) => {
+          localStorage.setItem('accessToken', data.access);
+          originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
+          return axios(originalRequest);
+        });
     }
     return Promise.reject(error);
   }

@@ -1,7 +1,6 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
+from ..materials.models import Material
 
 
 class Seal(models.Model):
@@ -26,8 +25,7 @@ class Seal(models.Model):
     weight = models.FloatField(blank=True, null=True)
     drill_hole_diameter = models.FloatField(blank=True, null=True)
     perforations = models.CharField(blank=True, max_length=255)
-
-    # material
+    materials = models.ManyToManyField(Material)
     POOR = 0
     FAIR = 1
     GOOD = 2

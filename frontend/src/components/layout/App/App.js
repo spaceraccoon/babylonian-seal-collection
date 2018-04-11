@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
-import { Layout } from 'antd';
+import { Breadcrumb, Layout } from 'antd';
 
 import Navigation from '../Navigation/Navigation';
 import SealList from '../../pages/SealList/SealList';
@@ -11,7 +11,7 @@ import SignIn from '../../pages/SignIn/SignIn';
 
 import './App.css';
 
-const { Footer } = Layout;
+const { Content, Footer } = Layout;
 
 const PrivateRoute = ({ component: Component, ...rest }) => (
   <Route
@@ -36,13 +36,19 @@ class App extends Component {
     return (
       <Layout style={{ minHeight: '100vh' }}>
         <Navigation />
-        <Switch>
-          <Route exact path="/" component={SealList} />
-          <PrivateRoute exact path="/seal/create" component={SealCreate} />
-          <PrivateRoute path="/seal/:id/edit" component={SealEdit} />
-          <Route path="/seal/:id" component={SealDetail} />
-          <Route exact path="/signin" component={SignIn} />
-        </Switch>
+        <Content style={{ padding: '0 50px' }}>
+          <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb.Item>Home</Breadcrumb.Item>
+            <Breadcrumb.Item>Seal</Breadcrumb.Item>
+          </Breadcrumb>
+          <Switch>
+            <Route exact path="/" component={SealList} />
+            <PrivateRoute exact path="/seal/create" component={SealCreate} />
+            <PrivateRoute path="/seal/:id/edit" component={SealEdit} />
+            <Route path="/seal/:id" component={SealDetail} />
+            <Route exact path="/signin" component={SignIn} />
+          </Switch>
+        </Content>
         <Footer />
       </Layout>
     );

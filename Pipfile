@@ -19,6 +19,8 @@ dj-database-url = "*"
 
 [dev-packages]
 
+"autopep8" = "*"
+pylint-django = "*"
 
 
 [requires]
