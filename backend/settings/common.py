@@ -31,6 +31,10 @@ INSTALLED_APPS = [
     'backend.apps.seals',
     'backend.apps.users',
     'backend.apps.materials',
+    'backend.apps.iconographic_elements',
+    'backend.apps.scenes',
+    'backend.apps.art_styles',
+    'backend.apps.periods',
 ]
 
 REST_FRAMEWORK = {
@@ -48,7 +52,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -132,3 +135,5 @@ STATICFILES_DIRS = [os.path.join(
     BASE_DIR, '..', 'frontend', 'build').replace('\\', '/'), ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+# APPEND_SLASH = True

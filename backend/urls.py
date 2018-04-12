@@ -21,10 +21,15 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    re_path('admin/?', admin.site.urls),
     path('api/seal/', include('backend.apps.seals.urls')),
     path('api/user/', include('backend.apps.users.urls')),
     path('api/material/', include('backend.apps.materials.urls')),
+    path('api/iconographicelement/',
+         include('backend.apps.iconographic_elements.urls')),
+    path('api/scene/', include('backend.apps.scenes.urls')),
+    path('api/artstyle/', include('backend.apps.art_styles.urls')),
+    path('api/period/', include('backend.apps.periods.urls')),
     path('api/auth/token/obtain/', TokenObtainPairView.as_view()),
     path('api/auth/token/refresh/', TokenRefreshView.as_view()),
     re_path('.*', TemplateView.as_view(template_name='index.html')),

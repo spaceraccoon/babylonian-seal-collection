@@ -1,6 +1,10 @@
 from django.db import models
 
 from ..materials.models import Material
+from ..iconographic_elements.models import IconographicElement
+from ..scenes.models import Scene
+from ..art_styles.models import ArtStyle
+from ..periods.models import Period
 
 
 class Seal(models.Model):
@@ -25,7 +29,7 @@ class Seal(models.Model):
     weight = models.FloatField(blank=True, null=True)
     drill_hole_diameter = models.FloatField(blank=True, null=True)
     perforations = models.CharField(blank=True, max_length=255)
-    materials = models.ManyToManyField(Material)
+    materials = models.ManyToManyField(Material, blank=True)
     POOR = 0
     FAIR = 1
     GOOD = 2
@@ -46,10 +50,8 @@ class Seal(models.Model):
     physical_remarks = models.TextField(blank=True)
     # type
 
-    # chronology
-    # period
-
     # provenance
+    periods = models.ManyToManyField(Period, blank=True)
     provenance = models.TextField(blank=True)
     provenance_remarks = models.TextField(blank=True)
     excavation_number = models.CharField(blank=True, max_length=255)
@@ -74,9 +76,10 @@ class Seal(models.Model):
         choices=DESIGN_CHOICES,
     )
     design_remarks = models.TextField(blank=True)
-    # scene
-    # artistic_style
-    # iconographic_elements
+    scenes = models.ManyToManyField(Scene, blank=True)
+    art_styles = models.ManyToManyField(ArtStyle, blank=True)
+    iconographic_elements = models.ManyToManyField(
+        IconographicElement, blank=True)
 
     # images
     # images

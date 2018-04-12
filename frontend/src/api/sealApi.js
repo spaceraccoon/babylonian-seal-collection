@@ -5,27 +5,32 @@ import getHeaders from '../utils/getHeaders';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
-axios.interceptors.response.use(
-  response => {
-    return response;
-  },
-  error => {
+const setTokenInterceptor = () => {
+  const tokenInterceptor = axios.interceptors.response.use(null, error => {
     const originalRequest = error.config;
-    if (error.response.status === 401 && !originalRequest._retry) {
+    if (error.response.status === 401) {
       originalRequest._retry = true;
+      axios.interceptors.response.eject(tokenInterceptor);
+      const refreshToken = localStorage.getItem('refreshToken');
       return axios
         .post('/api/auth/token/refresh/', {
-          refresh: localStorage.getItem('refreshToken'),
+          refresh: refreshToken,
         })
         .then(({ data }) => {
+          setTokenInterceptor();
           localStorage.setItem('accessToken', data.access);
           originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
-          return axios(originalRequest);
+          return Promise.resolve(originalRequest);
+        })
+        .catch(error => {
+          console.log(error);
+          message.error('Failed to authenticate user. Please sign in again.');
         });
     }
     return Promise.reject(error);
-  }
-);
+  });
+};
+setTokenInterceptor();
 
 const createSeal = async seal => {
   try {

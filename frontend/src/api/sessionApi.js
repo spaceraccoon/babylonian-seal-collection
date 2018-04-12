@@ -23,11 +23,13 @@ const signOut = () => {
   localStorage.removeItem('refreshToken');
 };
 
-const refreshAccessToken = async token => {
+const refreshAccessToken = async () => {
   try {
-    await axios.post('/api/auth/token/refresh/', {
-      refresh: token,
+    const refresh = localStorage.getItem('refreshToken');
+    const { data } = await axios.post('/api/auth/token/refresh/', {
+      refresh,
     });
+    localStorage.setItem('accessToken', data.access);
   } catch (error) {
     console.error(error);
   }

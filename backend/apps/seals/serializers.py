@@ -2,7 +2,20 @@ from rest_framework import serializers
 
 from .models import Seal
 from ..materials.models import Material
+from ..iconographic_elements.models import IconographicElement
+from ..scenes.models import Scene
+from ..art_styles.models import ArtStyle
+from ..periods.models import Period
 from ..materials.serializers import MaterialSerializer
+from ..iconographic_elements.serializers import IconographicElementSerializer
+from ..scenes.serializers import SceneSerializer
+from ..art_styles.serializers import ArtStyleSerializer
+from ..periods.serializers import PeriodSerializer
+
+
+def map_objects_by_name(name, model, validated_data):
+    data = validated_data.pop(name)
+    return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
 class SealSerializer(serializers.ModelSerializer):
@@ -12,6 +25,10 @@ class SealSerializer(serializers.ModelSerializer):
     surface_preservation_text = serializers.SerializerMethodField()
     design_text = serializers.SerializerMethodField()
     materials = MaterialSerializer(many=True)
+    iconographic_elements = IconographicElementSerializer(many=True)
+    scenes = SceneSerializer(many=True)
+    art_styles = ArtStyleSerializer(many=True)
+    periods = PeriodSerializer(many=True)
 
     def get_can_edit(self, obj):
         return obj.creator == self.context['request'].user or self.context['request'].user.is_staff or self.context['request'].user.is_superuser
@@ -48,38 +65,57 @@ class SealSerializer(serializers.ModelSerializer):
             'condition',
             'is_recarved',
             'physical_remarks',
+            'periods',
             'provenance',
             'provenance_remarks',
             'excavation_number',
             'design',
             'design_text',
             'design_remarks',
+            'scenes',
+            'art_styles',
+            'iconographic_elements',
         )
         model = Seal
 
     def create(self, validated_data):
-        if 'materials' in validated_data:
-            material_data = validated_data.pop('materials')
-        else:
-            material_data = None
+        materials = map_objects_by_name(
+            'materials', Material, validated_data)
+        iconographic_elements = map_objects_by_name(
+            'iconographic_elements', IconographicElement, validated_data)
+        scenes = map_objects_by_name(
+            'scenes', Scene, validated_data)
+        art_styles = map_objects_by_name(
+            'art_styles', ArtStyle, validated_data)
+        periods = map_objects_by_name(
+            'periods', Period, validated_data)
 
         seal = Seal.objects.create(**validated_data)
-
-        if material_data:
-            for item in material_data:
-                material = Material.objects.get_or_create(name=item['name'])[0]
-                seal.materials.add(material)
-
+        seal.materials.set(materials)
+        seal.iconographic_elements.set(iconographic_elements)
+        seal.scenes.set(scenes)
+        seal.art_styles.set(art_styles)
+        seal.periods.set(periods)
         seal.save()
         return seal
 
     def update(self, instance, validated_data):
-        if 'materials' in validated_data:
-            material_data = validated_data.pop('materials')
-            instance.materials.clear()
-            for item in material_data:
-                material = Material.objects.get_or_create(name=item['name'])[0]
-                instance.materials.add(material)
+        materials = map_objects_by_name(
+            'materials', Material, validated_data)
+        iconographic_elements = map_objects_by_name(
+            'iconographic_elements', IconographicElement, validated_data)
+        scenes = map_objects_by_name(
+            'scenes', Scene, validated_data)
+        art_styles = map_objects_by_name(
+            'art_styles', ArtStyle, validated_data)
+        periods = map_objects_by_name(
+            'periods', Period, validated_data)
+        instance.materials.set(materials)
+        instance.iconographic_elements.set(iconographic_elements)
+        instance.scenes.set(scenes)
+        instance.art_styles.set(art_styles)
+        instance.periods.set(periods)
+
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(
             'cdli_number', instance.cdli_number)

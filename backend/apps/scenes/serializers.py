@@ -1,31 +1,31 @@
 from rest_framework import serializers
 from rest_framework import exceptions
 
-from .models import Material
+from .models import Scene
 
 
-class MaterialSerializer(serializers.ModelSerializer):
+class SceneSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
-        if Material.objects.filter(name=validated_data['name']).exists():
+        if Scene.objects.filter(name=validated_data['name']).exists():
             raise exceptions.ValidationError(
                 exceptions._get_error_details({
-                    'materials': {
-                        'name': ['material with this name already exists.']
+                    'scenes': {
+                        'name': ['scene with this name already exists.']
                     }
                 })
             )
-        return Material.objects.create(**validated_data)
+        return Scene.objects.create(**validated_data)
 
     class Meta:
         fields = ('id', 'name')
-        model = Material
+        model = Scene
         extra_kwargs = {
             'name': {'validators': []},
         }
 
 
-class DetailMaterialSerializer(serializers.ModelSerializer):
+class DetailSceneSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('id', 'name', 'seal_set')
-        model = Material
+        model = Scene
         depth = 1

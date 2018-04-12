@@ -4,6 +4,7 @@ import { Link, Redirect } from 'react-router-dom';
 import Moment from 'react-moment';
 
 import { fetchSeal, deleteSeal } from '../../../api/sealApi';
+import stringToColor from '../../../utils/stringToColor';
 
 class SealList extends Component {
   state = {
@@ -116,7 +117,9 @@ class SealList extends Component {
             <strong>Materials: </strong>
             {this.state.seal.materials &&
               this.state.seal.materials.map(material => (
-                <Tag key={material.id}>{material.name}</Tag>
+                <Tag color={stringToColor(material.name)} key={material.id}>
+                  {material.name}
+                </Tag>
               ))}
           </li>
           <li>
@@ -137,15 +140,71 @@ class SealList extends Component {
             {this.state.seal.physical_remarks}
           </li>
         </ul>
+        <h2>Origin</h2>
+        <ul>
+          <li>
+            <strong>Periods: </strong>
+            {this.state.seal.periods &&
+              this.state.seal.periods.map(period => (
+                <Tag color={stringToColor(period.name)} key={period.id}>
+                  {period.name}
+                </Tag>
+              ))}
+          </li>
+          <li>
+            <strong>Provenance: </strong>
+            {this.state.seal.provenance}
+          </li>
+          <li>
+            <strong>Provenance Remarks: </strong>
+            {this.state.seal.provenance_remarks}
+          </li>
+          <li>
+            <strong>Excavation Number: </strong>
+            {this.state.seal.excavation_number}
+          </li>
+        </ul>
         <h2>Design</h2>
         <ul>
           <li>
-            <strong>Type: </strong>
+            <strong>Design Type: </strong>
             {this.state.seal.design_text}
           </li>
           <li>
-            <strong>Remarks: </strong>
+            <strong>Design Remarks: </strong>
             {this.state.seal.design_remarks}
+          </li>
+          <li>
+            <strong>Scenes: </strong>
+            {this.state.seal.scenes &&
+              this.state.seal.scenes.map(scene => (
+                <Tag color={stringToColor(scene.name)} key={scene.id}>
+                  {scene.name}
+                </Tag>
+              ))}
+          </li>
+          <li>
+            <strong>Art Styles: </strong>
+            {this.state.seal.art_styles &&
+              this.state.seal.art_styles.map(art_style => (
+                <Tag color={stringToColor(art_style.name)} key={art_style.id}>
+                  {art_style.name}
+                </Tag>
+              ))}
+          </li>
+          <li>
+            <strong>Iconographic Elements: </strong>
+            {this.state.seal.iconographic_elements &&
+              this.state.seal.iconographic_elements.map(
+                iconographic_element => (
+                  <Tag
+                    color={stringToColor(iconographic_element.name)}
+                    key={iconographic_element.id}
+                  >
+                    {iconographic_element.name}
+                  </Tag>
+                )
+              )}
           </li>
         </ul>
       </div>
