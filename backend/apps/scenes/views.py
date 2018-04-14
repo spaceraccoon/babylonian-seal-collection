@@ -1,6 +1,5 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAdminUser, DjangoModelPermissionsOrAnonReadOnly
-from rest_framework.validators import UniqueValidator
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
 
 from .models import Scene
 from .serializers import SceneSerializer, DetailSceneSerializer

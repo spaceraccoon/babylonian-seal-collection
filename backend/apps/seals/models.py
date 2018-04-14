@@ -5,6 +5,8 @@ from ..iconographic_elements.models import IconographicElement
 from ..scenes.models import Scene
 from ..art_styles.models import ArtStyle
 from ..periods.models import Period
+from ..publications.models import Publication
+from ..texts.models import Text
 
 
 class Seal(models.Model):
@@ -57,7 +59,7 @@ class Seal(models.Model):
     excavation_number = models.CharField(blank=True, max_length=255)
 
     # content
-    # text
+    texts = models.ManyToManyField(Text, blank=True)
     # historical_relationships
 
     # impressions
@@ -85,7 +87,8 @@ class Seal(models.Model):
     # images
 
     # bibliography
-    # publications
+    publications = models.ManyToManyField(
+        Publication, blank=True)
 
     def __str__(self):
         """A string representation of the model."""

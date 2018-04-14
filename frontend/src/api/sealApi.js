@@ -20,7 +20,7 @@ const setTokenInterceptor = () => {
           setTokenInterceptor();
           localStorage.setItem('accessToken', data.access);
           originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
-          return Promise.resolve(originalRequest);
+          return axios(originalRequest);
         })
         .catch(error => {
           console.log(error);

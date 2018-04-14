@@ -1,0 +1,18 @@
+.seal-detail {
+  margin-bottom: 4px;
+}
+
+.seal-detail__label {
+  text-align: right;
+}
+
+.seal-detail__label label::after {
+  content: ':';
+  margin: 0 8px 0 2px;
+  position: relative;
+  top: -0.5px;
+}
+
+.seal-detail .ant-collapse {
+  margin-bottom: 4px;
+}

@@ -1,3 +1,5 @@
+import isISBN from 'validator/lib/isISBN';
+
 import { charFieldRules, requiredCharFieldRules } from './fieldRules';
 
 const publicationFields = [
@@ -18,13 +20,16 @@ const publicationFields = [
     rules: [charFieldRules],
   },
   {
-    type: 'charField',
+    type: 'yearField',
     label: 'Year',
     field: 'year',
     rules: [
-      charFieldRules,
       {
-        pattern: /^\d{4}$/,
+        type: 'number',
+        range: {
+          min: 0,
+          max: new Date().getFullYear(),
+        },
         message: 'Please enter a valid year!',
       },
     ],
@@ -36,11 +41,43 @@ const publicationFields = [
     rules: [
       charFieldRules,
       {
-        pattern: /(?=[0-9X]{10}$|(?=(?:[0-9]+[-●]){3})[-●0-9X]{13}$|97[89][0-9]{10}$|(?=(?:[0-9]+[-●]){4})[-●0-9]{17}$)/,
+        validator: (rule, value, callback) =>
+          !value || isISBN(value) ? callback() : callback(false),
         message: 'Please enter a valid ISBN-10 or ISBN-13!',
       },
     ],
   },
 ];
 
-export { publicationFields };
+const textFields = [
+  {
+    type: 'id',
+    field: 'id',
+  },
+  {
+    type: 'charField',
+    label: 'Title',
+    field: 'title',
+    rules: [charFieldRules, requiredCharFieldRules],
+  },
+  {
+    type: 'tagsField',
+    label: 'Languages',
+    field: 'languages',
+    rules: [],
+  },
+  {
+    type: 'textField',
+    label: 'Transliteration',
+    field: 'transliteration',
+    rules: [],
+  },
+  {
+    type: 'textField',
+    label: 'Translation',
+    field: 'translation',
+    rules: [],
+  },
+];
+
+export { publicationFields, textFields };

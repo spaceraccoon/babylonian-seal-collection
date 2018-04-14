@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react';
 import Moment from 'react-moment';
 import _ from 'lodash';
 import { Link } from 'react-router-dom';
-import { Divider, Popconfirm, Table } from 'antd';
+import { Button, Popconfirm, Table } from 'antd';
 
 import { fetchSeals, deleteSeal } from '../../../api/sealApi';
+import './SealList.css';
 
 class SealList extends Component {
   state = {
@@ -40,12 +41,16 @@ class SealList extends Component {
         render: (id, seal) => {
           return (
             <Fragment>
-              <Link to={`/seal/${id}`}>View</Link>
+              <Link to={`/seal/${id}`}>
+                <Button className="seal-table__button">View</Button>
+              </Link>
               {seal.can_edit && (
                 <Fragment>
-                  <Divider type="vertical" />
-                  <Link to={`/seal/${id}/edit`}>Edit</Link>
-                  <Divider type="vertical" />
+                  <Link to={`/seal/${id}/edit`}>
+                    <Button className="seal-table__button" type="primary">
+                      Edit
+                    </Button>
+                  </Link>
                   <Popconfirm
                     title="Are you sure？"
                     onConfirm={async () => {
@@ -60,7 +65,9 @@ class SealList extends Component {
                     okText="Yes"
                     cancelText="No"
                   >
-                    <a>Delete</a>
+                    <Button className="seal-table__button" type="danger">
+                      Delete
+                    </Button>
                   </Popconfirm>
                 </Fragment>
               )}
@@ -73,9 +80,11 @@ class SealList extends Component {
     return (
       <div className="content-body">
         <Table
+          className="seal-table"
           columns={columns}
           dataSource={this.state.seals}
           loading={this.state.isLoading}
+          rowClassName="seal-table__row"
           rowKey="id"
         />
       </div>

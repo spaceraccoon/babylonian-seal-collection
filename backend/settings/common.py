@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'isbn_field',
     'backend.apps.seals',
     'backend.apps.users',
     'backend.apps.materials',
@@ -35,6 +36,9 @@ INSTALLED_APPS = [
     'backend.apps.scenes',
     'backend.apps.art_styles',
     'backend.apps.periods',
+    'backend.apps.publications',
+    'backend.apps.languages',
+    'backend.apps.texts',
 ]
 
 REST_FRAMEWORK = {

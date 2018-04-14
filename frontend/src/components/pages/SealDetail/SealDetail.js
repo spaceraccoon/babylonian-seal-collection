@@ -1,10 +1,13 @@
 import React, { Component, Fragment } from 'react';
-import { Button, Popconfirm, Tag } from 'antd';
+import { Button, Popconfirm } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
-import Moment from 'react-moment';
 
+import CharDetail from './components/CharDetail/CharDetail';
+import TagsDetail from './components/TagsDetail/TagsDetail';
+import NestedItemsDetail from './components/NestedItemsDetail/NestedItemsDetail';
+import { publicationDetails, textDetails } from './data/itemDetails';
 import { fetchSeal, deleteSeal } from '../../../api/sealApi';
-import stringToColor from '../../../utils/stringToColor';
+import './SealDetail.css';
 
 class SealList extends Component {
   state = {
@@ -50,163 +53,99 @@ class SealList extends Component {
         )}
 
         <h2>Metadata</h2>
-        <ul>
-          <li>
-            <strong>Created at: </strong>
-            <Moment date={this.state.seal.created_at} />
-          </li>
-          <li>
-            <strong>Created by: </strong>
-            {this.state.seal.creator_username}
-          </li>
-          <li>
-            <strong>Updated at: </strong>
-            <Moment date={this.state.seal.updated_at} />
-          </li>
-        </ul>
+        <CharDetail
+          label="Created at"
+          value={this.state.seal.created_at}
+          time
+        />
+        <CharDetail
+          label="Created by"
+          value={this.state.seal.creator_username}
+        />
+        <CharDetail
+          label="Updated at"
+          value={this.state.seal.updated_at}
+          time
+        />
         <h2>Identification</h2>
-        <ul>
-          <li>
-            <strong>CDLI Number: </strong>
-            {this.state.seal.cdli_number}
-          </li>
-          <li>
-            <strong>Museum Number: </strong>
-            {this.state.seal.museum_number}
-          </li>
-          <li>
-            <strong>Accession Number: </strong>
-            {this.state.seal.accession_number}
-          </li>
-          <li>
-            <strong>Publication Number: </strong>
-            {this.state.seal.publication_number}
-          </li>
-          <li>
-            <strong>Collection: </strong>
-            {this.state.seal.collection}
-          </li>
-        </ul>
+        <CharDetail label="CDLI Number" value={this.state.seal.cdli_number} />
+        <CharDetail
+          label="Museum Number"
+          value={this.state.seal.museum_number}
+        />
+        <CharDetail
+          label="Accession Number"
+          value={this.state.seal.accession_number}
+        />
+        <CharDetail
+          label="Publication Number"
+          value={this.state.seal.publication_number}
+        />
+        <CharDetail label="Collection" value={this.state.seal.collection} />
         <h2>Physical</h2>
-        <ul>
-          <li>
-            <strong>Height (mm): </strong>
-            {this.state.seal.height}
-          </li>
-          <li>
-            <strong>Thickness (mm): </strong>
-            {this.state.seal.thickness}
-          </li>
-          <li>
-            <strong>Width (mm): </strong>
-            {this.state.seal.width}
-          </li>
-          <li>
-            <strong>Weight (g): </strong>
-            {this.state.seal.weight}
-          </li>
-          <li>
-            <strong>Drill Hole Diameter (mm): </strong>
-            {this.state.seal.drill_hole_diameter}
-          </li>
-          <li>
-            <strong>Perforations: </strong>
-            {this.state.seal.perforations}
-          </li>
-          <li>
-            <strong>Materials: </strong>
-            {this.state.seal.materials &&
-              this.state.seal.materials.map(material => (
-                <Tag color={stringToColor(material.name)} key={material.id}>
-                  {material.name}
-                </Tag>
-              ))}
-          </li>
-          <li>
-            <strong>Surface Preservation: </strong>
-            {this.state.seal.surface_preservation_text}
-          </li>
-          <li>
-            <strong>Condition: </strong>
-            {this.state.seal.condition}
-          </li>
-          <li>
-            <strong>Is Recarved: </strong>
-            {this.state.seal.is_recarved &&
-              this.state.seal.is_recarved.toString()}
-          </li>
-          <li>
-            <strong>Physical Remarks: </strong>
-            {this.state.seal.physical_remarks}
-          </li>
-        </ul>
+        <CharDetail label="Height (mm)" value={this.state.seal.height} />
+        <CharDetail label="Thickness (mm)" value={this.state.seal.thickness} />
+        <CharDetail label="Width (mm)" value={this.state.seal.width} />
+        <CharDetail label="Weight (g)" value={this.state.seal.weight} />
+        <CharDetail
+          label="Drill Hole Diameter (mm)"
+          value={this.state.seal.drill_hole_diameter}
+        />
+        <CharDetail label="Perforations" value={this.state.seal.perforations} />
+        <TagsDetail label="Materials" values={this.state.seal.materials} />
+        <CharDetail
+          label="Surface Preservation"
+          value={this.state.seal.surface_preservation_text}
+        />
+        <CharDetail label="Condition" value={this.state.seal.condition} />
+        <CharDetail
+          label="Is Recarved"
+          value={
+            typeof this.state.seal.is_recarved === 'boolean'
+              ? this.state.seal.is_recarved.toString()
+              : null
+          }
+        />
+        <CharDetail
+          label="Physical Remarks"
+          value={this.state.seal.physical_remarks}
+        />
         <h2>Origin</h2>
-        <ul>
-          <li>
-            <strong>Periods: </strong>
-            {this.state.seal.periods &&
-              this.state.seal.periods.map(period => (
-                <Tag color={stringToColor(period.name)} key={period.id}>
-                  {period.name}
-                </Tag>
-              ))}
-          </li>
-          <li>
-            <strong>Provenance: </strong>
-            {this.state.seal.provenance}
-          </li>
-          <li>
-            <strong>Provenance Remarks: </strong>
-            {this.state.seal.provenance_remarks}
-          </li>
-          <li>
-            <strong>Excavation Number: </strong>
-            {this.state.seal.excavation_number}
-          </li>
-        </ul>
+        <TagsDetail label="Periods" values={this.state.seal.periods} />
+        <CharDetail label="Provenance" value={this.state.seal.provenance} />
+        <CharDetail
+          label="Provenance Remarks"
+          value={this.state.seal.provenance_remarks}
+        />
+        <CharDetail
+          label="Excavation Number"
+          value={this.state.seal.excavation_number}
+        />
+        <h2>Content</h2>
+        <NestedItemsDetail
+          label="Texts"
+          values={this.state.seal.texts}
+          nestedItemLabel="title"
+          itemDetails={textDetails}
+        />
         <h2>Design</h2>
-        <ul>
-          <li>
-            <strong>Design Type: </strong>
-            {this.state.seal.design_text}
-          </li>
-          <li>
-            <strong>Design Remarks: </strong>
-            {this.state.seal.design_remarks}
-          </li>
-          <li>
-            <strong>Scenes: </strong>
-            {this.state.seal.scenes &&
-              this.state.seal.scenes.map(scene => (
-                <Tag color={stringToColor(scene.name)} key={scene.id}>
-                  {scene.name}
-                </Tag>
-              ))}
-          </li>
-          <li>
-            <strong>Art Styles: </strong>
-            {this.state.seal.art_styles &&
-              this.state.seal.art_styles.map(art_style => (
-                <Tag color={stringToColor(art_style.name)} key={art_style.id}>
-                  {art_style.name}
-                </Tag>
-              ))}
-          </li>
-          <li>
-            <strong>Iconographic Elements: </strong>
-            {this.state.seal.iconographic_elements &&
-              this.state.seal.iconographic_elements.map(
-                iconographic_element => (
-                  <Tag
-                    color={stringToColor(iconographic_element.name)}
-                    key={iconographic_element.id}
-                  >
-                    {iconographic_element.name}
-                  </Tag>
-                )
-              )}
-          </li>
-        </ul>
+        <CharDetail label="Design Type" value={this.state.seal.design_text} />
+        <CharDetail
+          label="Design Remarks"
+          value={this.state.seal.design_remarks}
+        />
+        <TagsDetail label="Scenes" values={this.state.seal.scenes} />
+        <TagsDetail label="Art Styles" values={this.state.seal.art_styles} />
+        <TagsDetail
+          label="Iconographic Elements"
+          values={this.state.seal.iconographic_elements}
+        />
+        <NestedItemsDetail
+          label="Publications"
+          values={this.state.seal.publications}
+          nestedItemLabel="title"
+          itemDetails={publicationDetails}
+        />
       </div>
     );
   }

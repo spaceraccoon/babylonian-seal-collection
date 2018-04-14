@@ -6,11 +6,28 @@ from ..iconographic_elements.models import IconographicElement
 from ..scenes.models import Scene
 from ..art_styles.models import ArtStyle
 from ..periods.models import Period
+from ..publications.models import Publication
+from ..texts.models import Text
+from ..languages.models import Language
 from ..materials.serializers import MaterialSerializer
 from ..iconographic_elements.serializers import IconographicElementSerializer
 from ..scenes.serializers import SceneSerializer
 from ..art_styles.serializers import ArtStyleSerializer
 from ..periods.serializers import PeriodSerializer
+from ..publications.serializers import PublicationSerializer
+from ..texts.serializers import TextSerializer
+
+
+def get_or_create_or_update(obj_id, defaults, model, user):
+    try:
+        obj = model.objects.get(id=obj_id)
+        if obj.creator == user or user.is_staff or user.is_superuser:
+            model.objects.filter(id=obj.id).update(**defaults)
+            return model.objects.get(id=obj.id)
+        else:
+            return obj
+    except model.DoesNotExist:
+        return model.objects.create(**defaults, creator=user)
 
 
 def map_objects_by_name(name, model, validated_data):
@@ -29,6 +46,8 @@ class SealSerializer(serializers.ModelSerializer):
     scenes = SceneSerializer(many=True)
     art_styles = ArtStyleSerializer(many=True)
     periods = PeriodSerializer(many=True)
+    publications = PublicationSerializer(many=True)
+    texts = TextSerializer(many=True)
 
     def get_can_edit(self, obj):
         return obj.creator == self.context['request'].user or self.context['request'].user.is_staff or self.context['request'].user.is_superuser
@@ -69,12 +88,14 @@ class SealSerializer(serializers.ModelSerializer):
             'provenance',
             'provenance_remarks',
             'excavation_number',
+            'texts',
             'design',
             'design_text',
             'design_remarks',
             'scenes',
             'art_styles',
             'iconographic_elements',
+            'publications'
         )
         model = Seal
 
@@ -90,12 +111,37 @@ class SealSerializer(serializers.ModelSerializer):
         periods = map_objects_by_name(
             'periods', Period, validated_data)
 
+        if 'publications' in validated_data:
+            publication_data = validated_data.pop('publications')
+            publications = list(map(lambda x: Publication.objects.get_or_create(
+                id=x['id'],
+                defaults={'creator': self.context['request'].user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
+
+        if 'texts' in validated_data:
+            text_data = validated_data.pop('texts')
+            texts = []
+            for text in text_data:
+                new_text = Text.objects.get_or_create(
+                    id=text['id'],
+                    defaults={'creator': self.context['request'].user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
+                languages = text['languages']
+                for language in languages:
+                    new_language = Language.objects.get_or_create(
+                        name=language['name'])[0]
+                    new_text.languages.add(new_language)
+                new_text.save()
+                texts.append(new_text)
+
         seal = Seal.objects.create(**validated_data)
         seal.materials.set(materials)
         seal.iconographic_elements.set(iconographic_elements)
         seal.scenes.set(scenes)
         seal.art_styles.set(art_styles)
         seal.periods.set(periods)
+        if publications:
+            seal.publications.set(publications)
+        if texts:
+            seal.texts.set(texts)
         seal.save()
         return seal
 
@@ -115,6 +161,46 @@ class SealSerializer(serializers.ModelSerializer):
         instance.scenes.set(scenes)
         instance.art_styles.set(art_styles)
         instance.periods.set(periods)
+
+        user = self.context['request'].user
+
+        if 'publications' in validated_data:
+            publication_data = validated_data.pop('publications')
+            publications = list(map(lambda x: get_or_create_or_update(
+                x['id'],
+                {'title': x['title'], 'author': x.get(
+                    'author', ''), 'year': x['year'], 'isbn': x['isbn']},
+                Publication,
+                user), publication_data))
+            instance.publications.set(publications)
+
+        if 'texts' in validated_data:
+            text_data = validated_data.pop('texts')
+            texts = []
+            for text in text_data:
+                languages = []
+                for language in text['languages']:
+                    languages.append(Language.objects.get_or_create(
+                        name=language['name'])[0])
+                try:
+                    old_text = Text.objects.get(id=text['id'])
+                    if old_text.creator == user or user.is_staff or user.is_superuser:
+                        old_text.languages.set(languages)
+                        old_text.save()
+                        Text.objects.filter(id=text['id']).update(title=text['title'],
+                                                                  transliteration=text.get(
+                                                                      'transliteration', ''),
+                                                                  translation=text.get('translation', ''))
+                        texts.append(Text.objects.get(id=text['id']))
+                    else:
+                        texts.append(old_text)
+                except Text.DoesNotExist:
+                    new_text = Text.objects.create(creator=user, title=text['title'], transliteration=text.get(
+                        'transliteration', ''), translation=text.get('translation', ''))
+                    new_text.languages.set(languages)
+                    new_text.save()
+                    texts.append(new_text)
+            instance.texts.set(texts)
 
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(

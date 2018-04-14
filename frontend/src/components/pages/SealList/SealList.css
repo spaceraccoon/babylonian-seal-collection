@@ -1,0 +1,7 @@
+tr.seal-table__row:hover > td {
+  background: none;
+}
+
+.seal-table__button {
+  margin-right: 8px;
+}

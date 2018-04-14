@@ -6,7 +6,7 @@ import { fetchSeal } from '../../../api/sealApi';
 
 class SealEdit extends Component {
   state = {
-    seal: {},
+    seal: null,
     redirect: false,
   };
 
@@ -31,7 +31,7 @@ class SealEdit extends Component {
 
     return (
       <div className="content-body">
-        <SealForm seal={this.state.seal} />
+        <SealForm seal={this.state.seal} edit />
       </div>
     );
   }

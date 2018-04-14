@@ -1,11 +1,11 @@
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    lg: { span: 3 },
+    lg: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    lg: { span: 10 },
+    lg: { span: 12 },
   },
 };
 
@@ -15,8 +15,8 @@ const formItemLayoutWithoutLabel = {
       span: 24,
     },
     lg: {
-      span: 10,
-      offset: 3,
+      span: 12,
+      offset: 4,
     },
   },
 };
@@ -24,11 +24,11 @@ const formItemLayoutWithoutLabel = {
 const nestedFormItemLayout = {
   labelCol: {
     xs: { span: 24 },
-    lg: { span: 3 },
+    lg: { span: 4 },
   },
   wrapperCol: {
     xs: { span: 24 },
-    lg: { span: 21 },
+    lg: { span: 20 },
   },
 };
 
