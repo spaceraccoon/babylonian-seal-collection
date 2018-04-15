@@ -6,7 +6,7 @@ import CharDetail from './components/CharDetail/CharDetail';
 import TagsDetail from './components/TagsDetail/TagsDetail';
 import NestedItemsDetail from './components/NestedItemsDetail/NestedItemsDetail';
 import { publicationDetails, textDetails } from './data/itemDetails';
-import { fetchSeal, deleteSeal } from '../../../api/sealApi';
+import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import './SealDetail.css';
 
 class SealList extends Component {
@@ -17,7 +17,7 @@ class SealList extends Component {
 
   async componentDidMount() {
     this.setState({
-      seal: await fetchSeal(this.props.match.params.id),
+      seal: await fetchResource(this.props.match.params.id, 'seal'),
     });
   }
 
@@ -38,7 +38,7 @@ class SealList extends Component {
             <Popconfirm
               title="Are you sure？"
               onConfirm={async () => {
-                if (await deleteSeal(this.state.seal.id)) {
+                if (await deleteResource(this.state.seal.id, 'seal')) {
                   this.setState({
                     redirect: true,
                   });

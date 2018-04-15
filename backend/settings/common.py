@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'isbn_field',
+    'django_filters',
+    'django_extensions',
     'backend.apps.seals',
     'backend.apps.users',
     'backend.apps.materials',
@@ -49,6 +51,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',)
 }
 
 MIDDLEWARE = [

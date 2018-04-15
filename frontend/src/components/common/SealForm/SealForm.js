@@ -9,15 +9,11 @@ import TagsField from './components/TagsField/TagsField';
 import NestedItemsField from './components/NestedItemsField/NestedItemsField';
 import { formItemLayout, formItemLayoutWithoutLabel } from './data/formLayouts';
 import { publicationFields, textFields } from './data/itemFields';
-import { createSeal, updateSeal } from '../../../api/sealApi';
-import { fetchMaterials } from '../../../api/materialApi';
-import { fetchIconographicElements } from '../../../api/iconographicElementApi';
-import { fetchScenes } from '../../../api/sceneApi';
-import { fetchArtStyles } from '../../../api/artStyleApi';
-import { fetchPeriods } from '../../../api/periodApi';
-import { fetchPublications } from '../../../api/publicationApi';
-import { fetchTexts } from '../../../api/textApi';
-import { fetchLanguages } from '../../../api/languageApi';
+import {
+  createResource,
+  fetchResources,
+  updateResource,
+} from '../../../api/resourceApi';
 
 const { Option } = Select;
 const { TextArea } = Input;
@@ -62,7 +58,6 @@ class SealForm extends Component {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
-        console.log(values);
         values = {
           ...values,
           materials: mapNamesToObject(values.materials),
@@ -82,11 +77,11 @@ class SealForm extends Component {
         };
         if (this.props.edit) {
           this.setState({
-            seal: await updateSeal(this.props.seal.id, values),
+            seal: await updateResource(this.props.seal.id, values, 'seal'),
           });
         } else {
           this.setState({
-            seal: await createSeal(values),
+            seal: await createResource(values, 'seal'),
           });
         }
       } else {
@@ -97,14 +92,14 @@ class SealForm extends Component {
 
   async componentDidMount() {
     this.setState({
-      materials: await fetchMaterials(),
-      iconographicElements: await fetchIconographicElements(),
-      scenes: await fetchScenes(),
-      artStyles: await fetchArtStyles(),
-      periods: await fetchPeriods(),
-      publications: await fetchPublications(),
-      texts: await fetchTexts(),
-      languages: await fetchLanguages(),
+      materials: await fetchResources('material'),
+      iconographicElements: await fetchResources('iconographicelement'),
+      scenes: await fetchResources('scene'),
+      artStyles: await fetchResources('artstyle'),
+      periods: await fetchResources('period'),
+      publications: await fetchResources('publication'),
+      texts: await fetchResources('text'),
+      languages: await fetchResources('language'),
       isLoading: false,
     });
   }

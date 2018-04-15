@@ -4,7 +4,8 @@ import _ from 'lodash';
 import { Link } from 'react-router-dom';
 import { Button, Popconfirm, Table } from 'antd';
 
-import { fetchSeals, deleteSeal } from '../../../api/sealApi';
+import { fetchResources, deleteResource } from '../../../api/resourceApi';
+
 import './SealList.css';
 
 class SealList extends Component {
@@ -16,7 +17,7 @@ class SealList extends Component {
   async componentDidMount() {
     this.setState({
       isLoading: false,
-      seals: await fetchSeals(),
+      seals: await fetchResources('seal'),
     });
   }
 
@@ -54,7 +55,7 @@ class SealList extends Component {
                   <Popconfirm
                     title="Are you sure？"
                     onConfirm={async () => {
-                      if (await deleteSeal(id)) {
+                      if (await deleteResource(id, 'seal')) {
                         this.setState({
                           seals: _.filter(this.state.seals, seal => {
                             return seal.id !== id;

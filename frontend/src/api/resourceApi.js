@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { message } from 'antd';
+import querystring from 'querystring';
 
 import getHeaders from '../utils/getHeaders';
 
 axios.defaults.xsrfCookieName = 'csrftoken';
 axios.defaults.xsrfHeaderName = 'X-CSRFToken';
+
 const setTokenInterceptor = () => {
   const tokenInterceptor = axios.interceptors.response.use(null, error => {
     const originalRequest = error.config;
@@ -19,6 +21,9 @@ const setTokenInterceptor = () => {
         .then(({ data }) => {
           setTokenInterceptor();
           localStorage.setItem('accessToken', data.access);
+          if (data.refresh) {
+            localStorage.setItem('refreshToken', data.refresh);
+          }
           originalRequest.headers['Authorization'] = `Bearer ${data.access}`;
           return axios(originalRequest);
         })
@@ -32,10 +37,14 @@ const setTokenInterceptor = () => {
 };
 setTokenInterceptor();
 
-const createSeal = async seal => {
+const createResource = async (resource, resourceName) => {
   try {
-    let { data } = await axios.post('/api/seal/', seal, getHeaders());
-    message.success('Created seal.');
+    let { data } = await axios.post(
+      `/api/${resourceName}/`,
+      resource,
+      getHeaders()
+    );
+    message.success(`Created ${resourceName}.`);
     return data;
   } catch (error) {
     console.error(error);
@@ -44,32 +53,42 @@ const createSeal = async seal => {
   }
 };
 
-const fetchSeal = async id => {
+const fetchResource = async (id, resourceName) => {
   try {
-    const { data } = await axios.get(`/api/seal/${id}/`, getHeaders());
+    const { data } = await axios.get(
+      `/api/${resourceName}/${id}/`,
+      getHeaders()
+    );
     return data;
   } catch (error) {
     console.error(error);
-    message.error('Failed to fetch seal.');
+    message.error(`Failed to fetch ${resourceName}.`);
     return null;
   }
 };
 
-const fetchSeals = async () => {
+const fetchResources = async (resourceName, queries) => {
   try {
-    const { data } = await axios.get('/api/seal/', getHeaders());
+    const { data } = await axios.get(
+      `/api/${resourceName}/?${querystring.stringify(queries)}`,
+      getHeaders()
+    );
     return data;
   } catch (error) {
     console.error(error);
-    message.error('Failed to fetch seals.');
+    message.error(`Failed to fetch ${resourceName}s.`);
     return null;
   }
 };
 
-const updateSeal = async (id, seal) => {
+const updateResource = async (id, resource, resourceName) => {
   try {
-    let { data } = await axios.patch(`/api/seal/${id}/`, seal, getHeaders());
-    message.success('Updated seal.');
+    let { data } = await axios.patch(
+      `/api/${resourceName}/${id}/`,
+      resource,
+      getHeaders()
+    );
+    message.success(`Updated ${resourceName}.`);
     return data;
   } catch (error) {
     console.error(error);
@@ -78,16 +97,22 @@ const updateSeal = async (id, seal) => {
   }
 };
 
-const deleteSeal = async (id, callback) => {
+const deleteResource = async (id, resourceName) => {
   try {
-    await await axios.delete(`/api/seal/${id}/`, getHeaders());
-    message.success('Deleted seal.');
+    await axios.delete(`/api/${resourceName}/${id}/`, getHeaders());
+    message.success(`Deleted ${resourceName}.`);
     return true;
   } catch (error) {
     console.error(error);
-    message.error('Failed to delete seal.');
+    message.error(`Failed to delete ${resourceName}.`);
     return false;
   }
 };
 
-export { createSeal, fetchSeal, fetchSeals, updateSeal, deleteSeal };
+export {
+  createResource,
+  fetchResource,
+  fetchResources,
+  updateResource,
+  deleteResource,
+};

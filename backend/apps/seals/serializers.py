@@ -35,6 +35,24 @@ def map_objects_by_name(name, model, validated_data):
     return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
+class ListSealSerializer(serializers.ModelSerializer):
+    can_edit = serializers.SerializerMethodField()
+    creator_username = serializers.ReadOnlyField(source='creator.username')
+
+    def get_can_edit(self, obj):
+        return obj.creator == self.context['request'].user or self.context['request'].user.is_staff or self.context['request'].user.is_superuser
+
+    class Meta:
+        fields = (
+            'id',
+            'can_edit',
+            'creator_username',
+            'updated_at',
+            'name',
+        )
+        model = Seal
+
+
 class SealSerializer(serializers.ModelSerializer):
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')

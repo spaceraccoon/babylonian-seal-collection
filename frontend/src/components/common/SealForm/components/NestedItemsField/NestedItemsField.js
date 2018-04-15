@@ -66,13 +66,9 @@ class NestedItemsField extends Component {
                     `${this.props.field}s[${index}].${
                       this.props.nestedItemLabel
                     }`
-                  )
-                    ? getFieldValue(
-                        `${this.props.field}s[${index}].${
-                          this.props.nestedItemLabel
-                        }`
-                      )
-                    : `New ${this.props.field}`}
+                  ) ||
+                    this.state.items[index][this.props.nestedItemLabel] ||
+                    `New ${this.props.field}`}
                   <Icon
                     className="dynamic-delete-button"
                     type="delete"

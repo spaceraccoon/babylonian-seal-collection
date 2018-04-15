@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Button, Form, Icon, Input } from 'antd';
 
-import { createUser } from '../../../../api/userApi';
+import { createResource } from '../../../../api/resourceApi';
 import { signIn } from '../../../../api/sessionApi';
 
 const FormItem = Form.Item;
@@ -12,7 +12,7 @@ class SignInForm extends Component {
     this.props.form.validateFields(async (err, values) => {
       if (!err) {
         if (this.props.register) {
-          await createUser(values);
+          await createResource(values, 'user');
         }
         if (await signIn(values)) {
           this.props.setState(() => ({
