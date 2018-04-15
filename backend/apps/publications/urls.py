@@ -4,6 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ListPublication.as_view()),
-    path('<int:pk>/', views.DetailPublication.as_view()),
+    path('', views.PublicationList.as_view()),
 ]

@@ -5,14 +5,12 @@ from .serializers import ListSealSerializer, SealSerializer
 from .permissions import IsCreatorOrAdminOrReadOnly
 
 
-class ListSeal(generics.ListCreateAPIView):
+class SealList(generics.ListCreateAPIView):
     queryset = Seal.objects.all()
-    serializer_class = SealSerializer
     permission_classes = (IsCreatorOrAdminOrReadOnly,)
-    # filter_fields = {
-    #     'name': ['exact', 'icontains'],
-    #     'materials': ['exact']
-    # }
+    filter_fields = {
+        'name': ['exact', 'icontains'],
+    }
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -23,7 +21,7 @@ class ListSeal(generics.ListCreateAPIView):
         serializer.save(creator=self.request.user)
 
 
-class DetailSeal(generics.RetrieveUpdateDestroyAPIView):
+class SealDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Seal.objects.all()
     serializer_class = SealSerializer
     permission_classes = (IsCreatorOrAdminOrReadOnly,)

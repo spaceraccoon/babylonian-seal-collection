@@ -1,17 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Language
-from .serializers import LanguageSerializer, DetailLanguageSerializer
+from .serializers import LanguageSerializer
 
 
-class ListLanguage(generics.ListCreateAPIView):
+class LanguageList(generics.ListAPIView):
     queryset = Language.objects.all()
     serializer_class = LanguageSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-class DetailLanguage(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Language.objects.all()
-    serializer_class = DetailLanguageSerializer
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)

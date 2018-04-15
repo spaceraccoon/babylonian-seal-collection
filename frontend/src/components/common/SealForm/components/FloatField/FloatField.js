@@ -12,7 +12,7 @@ class FloatField extends Component {
     return (
       <FormItem {...formItemLayout} label={this.props.label}>
         {getFieldDecorator(this.props.field, {
-          validateTrigger: ['onChange'],
+          validateTrigger: ['onChange', 'onBlur'],
           rules: [floatFieldRules],
         })(<InputNumber step={0.01} />)}
       </FormItem>

@@ -1,20 +1,14 @@
 from rest_framework import generics
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Publication
-from .serializers import PublicationSerializer, DetailPublicationSerializer
-from .permissions import IsCreatorOrAdminOrReadOnly
+from .serializers import PublicationSerializer
 
 
-class ListPublication(generics.ListCreateAPIView):
+class PublicationList(generics.ListAPIView):
     queryset = Publication.objects.all()
     serializer_class = PublicationSerializer
-    permission_classes = (IsCreatorOrAdminOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
         serializer.save(creator=self.request.user)
-
-
-class DetailPublication(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Publication.objects.all()
-    serializer_class = DetailPublicationSerializer
-    permission_classes = (IsCreatorOrAdminOrReadOnly,)

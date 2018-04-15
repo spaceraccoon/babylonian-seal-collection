@@ -1,17 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Period
-from .serializers import PeriodSerializer, DetailPeriodSerializer
+from .serializers import PeriodSerializer
 
 
-class ListPeriod(generics.ListCreateAPIView):
+class PeriodList(generics.ListAPIView):
     queryset = Period.objects.all()
     serializer_class = PeriodSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-class DetailPeriod(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Period.objects.all()
-    serializer_class = DetailPeriodSerializer
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)

@@ -172,6 +172,8 @@ class NestedItemsField extends Component {
                         {getFieldDecorator(
                           `${this.props.field}s[${index}].${itemField.field}`,
                           {
+                            validateTrigger: ['onChange', 'onBlur'],
+                            rules: itemField.rules,
                             initialValue: isExistingItem
                               ? this.state.items[index][itemField.field]
                               : [],

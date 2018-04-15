@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework import exceptions
 
 from .models import Text
 from ..languages.serializers import LanguageSerializer
@@ -17,11 +16,3 @@ class TextSerializer(serializers.ModelSerializer):
         fields = ('id', 'can_edit', 'title', 'languages',
                   'transliteration', 'translation')
         model = Text
-
-
-class DetailTextSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('id', 'can_edit', 'title', 'languages',
-                  'transliteration', 'translation', 'seal_set')
-        model = Text
-        depth = 1

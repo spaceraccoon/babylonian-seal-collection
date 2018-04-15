@@ -1,17 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import Scene
-from .serializers import SceneSerializer, DetailSceneSerializer
+from .serializers import SceneSerializer
 
 
-class ListScene(generics.ListCreateAPIView):
+class SceneList(generics.ListAPIView):
     queryset = Scene.objects.all()
     serializer_class = SceneSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-class DetailScene(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Scene.objects.all()
-    serializer_class = DetailSceneSerializer
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)

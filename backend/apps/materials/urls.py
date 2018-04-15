@@ -4,6 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ListMaterial.as_view()),
-    path('<int:pk>/', views.DetailMaterial.as_view()),
+    path('', views.MaterialList.as_view()),
 ]

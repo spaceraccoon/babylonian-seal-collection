@@ -1,6 +1,10 @@
 import isISBN from 'validator/lib/isISBN';
 
-import { charFieldRules, requiredCharFieldRules } from './fieldRules';
+import {
+  charFieldRules,
+  requiredCharFieldRules,
+  tagsFieldRules,
+} from './fieldRules';
 
 const publicationFields = [
   {
@@ -64,7 +68,7 @@ const textFields = [
     type: 'tagsField',
     label: 'Languages',
     field: 'languages',
-    rules: [],
+    rules: [tagsFieldRules],
   },
   {
     type: 'textField',

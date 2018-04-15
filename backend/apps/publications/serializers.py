@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework import exceptions
 
 from .models import Publication
 
@@ -15,11 +14,3 @@ class PublicationSerializer(serializers.ModelSerializer):
         fields = ('id', 'can_edit',
                   'title', 'author', 'year', 'isbn')
         model = Publication
-
-
-class DetailPublicationSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = ('id', 'can_edit', 'title',
-                  'author', 'year', 'isbn', 'seal_set')
-        model = Publication
-        depth = 1

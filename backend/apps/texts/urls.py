@@ -4,6 +4,5 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.ListText.as_view()),
-    path('<int:pk>/', views.DetailText.as_view()),
+    path('', views.TextList.as_view()),
 ]

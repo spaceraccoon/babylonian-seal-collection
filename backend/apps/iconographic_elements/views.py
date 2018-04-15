@@ -1,17 +1,11 @@
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 from .models import IconographicElement
-from .serializers import IconographicElementSerializer, DetailIconographicElementSerializer
+from .serializers import IconographicElementSerializer
 
 
-class ListIconographicElement(generics.ListCreateAPIView):
+class IconographicElementList(generics.ListAPIView):
     queryset = IconographicElement.objects.all()
     serializer_class = IconographicElementSerializer
     permission_classes = (IsAuthenticatedOrReadOnly,)
-
-
-class DetailIconographicElement(generics.RetrieveUpdateDestroyAPIView):
-    queryset = IconographicElement.objects.all()
-    serializer_class = DetailIconographicElementSerializer
-    permission_classes = (DjangoModelPermissionsOrAnonReadOnly,)
