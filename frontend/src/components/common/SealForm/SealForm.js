@@ -8,7 +8,12 @@ import FloatField from './components/FloatField/FloatField';
 import TagsField from './components/TagsField/TagsField';
 import NestedItemsField from './components/NestedItemsField/NestedItemsField';
 import { formItemLayout, formItemLayoutWithoutLabel } from './data/formLayouts';
-import { publicationFields, textFields } from './data/itemFields';
+import {
+  publicationFields,
+  textFields,
+  imageFields,
+  historicalRelationshipFields,
+} from '../../../data/itemFields';
 import {
   createResource,
   fetchResources,
@@ -36,9 +41,20 @@ const remapNestedItems = (field, nestedItemKey) =>
   field.map(nestedItem => {
     return {
       ...nestedItem,
-      [nestedItemKey]: nestedItem[nestedItemKey].map(value => value.name),
+      [nestedItemKey]: Array.isArray(nestedItem[nestedItemKey])
+        ? nestedItem[nestedItemKey].map(value => value.name)
+        : nestedItem[nestedItemKey] ? nestedItem[nestedItemKey].name : null,
     };
   });
+
+const mapHistoricalPersonOptions = async () => {
+  let historicalPersons = await fetchResources('historicalperson');
+  return historicalPersons.map(historical_person => {
+    return {
+      historical_person,
+    };
+  });
+};
 
 class SealForm extends Component {
   state = {
@@ -52,6 +68,8 @@ class SealForm extends Component {
     publications: [],
     texts: [],
     languages: [],
+    images: [],
+    historicalPersons: [],
   };
 
   handleSubmit = e => {
@@ -66,6 +84,7 @@ class SealForm extends Component {
           art_styles: mapNamesToObject(values.art_styles),
           periods: mapNamesToObject(values.periods),
           publications: values.publications || [],
+          languages: mapNamesToObject(values.languages),
           texts: values.texts
             ? values.texts.map(text => {
                 return {
@@ -74,7 +93,10 @@ class SealForm extends Component {
                 };
               })
             : [],
+          images: values.images || [],
+          historical_relationships: values.historical_relationships || [],
         };
+        console.log(values);
         if (this.props.edit) {
           this.setState({
             seal: await updateResource(this.props.seal.id, values, 'seal'),
@@ -100,6 +122,7 @@ class SealForm extends Component {
       publications: await fetchResources('publication'),
       texts: await fetchResources('text'),
       languages: await fetchResources('language'),
+      historicalPersons: await mapHistoricalPersonOptions(),
       isLoading: false,
     });
   }
@@ -224,9 +247,29 @@ class SealForm extends Component {
             field="excavation_number"
           />
           <h2>Content</h2>
+          <TagsField
+            form={this.props.form}
+            label="Languages"
+            field="languages"
+            options={this.state.languages}
+          />
           {(!this.props.edit || this.props.seal) && (
             <NestedItemsField
-              field="text"
+              field="historical_relationships"
+              form={this.props.form}
+              options={this.state.historicalPersons}
+              initialItems={
+                this.props.seal ? this.props.seal.historical_relationships : []
+              }
+              itemFields={historicalRelationshipFields}
+              nestedItemLabel="historical_person.name"
+              label="Historical Relationships"
+              searchLabel="historical person"
+            />
+          )}
+          {(!this.props.edit || this.props.seal) && (
+            <NestedItemsField
+              field="texts"
               form={this.props.form}
               nestedOptions={{
                 languages: this.state.languages,
@@ -272,10 +315,21 @@ class SealForm extends Component {
             field="iconographic_elements"
             options={this.state.iconographicElements}
           />
+          <h2>Images</h2>
+          {(!this.props.edit || this.props.seal) && (
+            <NestedItemsField
+              field="images"
+              form={this.props.form}
+              initialItems={this.props.seal ? this.props.seal.images : []}
+              itemFields={imageFields}
+              nestedItemLabel="name"
+              label="Images"
+            />
+          )}
           <h2>Bibliography</h2>
           {(!this.props.edit || this.props.seal) && (
             <NestedItemsField
-              field="publication"
+              field="publications"
               form={this.props.form}
               options={this.state.publications}
               initialItems={this.props.seal ? this.props.seal.publications : []}
@@ -310,6 +364,7 @@ const WrappedSealForm = Form.create({
             'scenes',
             'art_styles',
             'periods',
+            'languages',
           ].includes(key)
         ) {
           return mapNameToFormField(field);

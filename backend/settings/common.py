@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv(), override=True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,6 +44,9 @@ INSTALLED_APPS = [
     'backend.apps.publications',
     'backend.apps.languages',
     'backend.apps.texts',
+    'backend.apps.images',
+    'backend.apps.historical_relationships',
+    'backend.apps.historical_persons',
 ]
 
 REST_FRAMEWORK = {
@@ -144,3 +150,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # APPEND_SLASH = True
+
+# S3
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
+
+#  Secret key
+SECRET_KEY = os.getenv('SECRET_KEY')

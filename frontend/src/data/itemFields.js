@@ -9,6 +9,7 @@ import {
 const publicationFields = [
   {
     type: 'id',
+    label: 'ID',
     field: 'id',
   },
   {
@@ -29,7 +30,8 @@ const publicationFields = [
     field: 'year',
     rules: [
       {
-        type: 'number',
+        validator: (rule, value, callback) =>
+          !value || (!isNaN(value) && value > 0) ? callback() : callback(false),
         range: {
           min: 0,
           max: new Date().getFullYear(),
@@ -56,6 +58,7 @@ const publicationFields = [
 const textFields = [
   {
     type: 'id',
+    label: 'ID',
     field: 'id',
   },
   {
@@ -84,4 +87,72 @@ const textFields = [
   },
 ];
 
-export { publicationFields, textFields };
+const imageFields = [
+  {
+    type: 'id',
+    label: 'ID',
+    field: 'id',
+  },
+  {
+    type: 'charField',
+    label: 'Name',
+    field: 'name',
+    rules: [charFieldRules],
+  },
+  {
+    type: 'charField',
+    label: 'Source',
+    field: 'source',
+    rules: [charFieldRules],
+  },
+  {
+    type: 'textField',
+    label: 'Description',
+    field: 'description',
+    rules: [],
+  },
+  {
+    type: 'image',
+    label: 'Upload',
+    field: 's3_key',
+    rules: [{ required: true, message: 'Please upload an image!' }],
+  },
+];
+
+const historicalRelationshipFields = [
+  {
+    type: 'id',
+    label: 'ID',
+    field: 'id',
+  },
+  {
+    type: 'textField',
+    label: 'Remarks',
+    field: 'remarks',
+    rules: [],
+  },
+  {
+    type: 'id',
+    label: 'Person ID',
+    field: 'historical_person.id',
+  },
+  {
+    type: 'charField',
+    label: 'Person Name',
+    field: 'historical_person.name',
+    rules: [charFieldRules, requiredCharFieldRules],
+  },
+  {
+    type: 'textField',
+    label: 'Person Remarks',
+    field: 'historical_person.remarks',
+    rules: [],
+  },
+];
+
+export {
+  publicationFields,
+  textFields,
+  imageFields,
+  historicalRelationshipFields,
+};

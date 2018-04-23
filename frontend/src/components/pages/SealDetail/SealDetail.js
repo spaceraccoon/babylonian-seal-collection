@@ -5,7 +5,12 @@ import { Link, Redirect } from 'react-router-dom';
 import CharDetail from './components/CharDetail/CharDetail';
 import TagsDetail from './components/TagsDetail/TagsDetail';
 import NestedItemsDetail from './components/NestedItemsDetail/NestedItemsDetail';
-import { publicationDetails, textDetails } from './data/itemDetails';
+import {
+  publicationFields,
+  textFields,
+  imageFields,
+  historicalRelationshipFields,
+} from '../../../data/itemFields';
 import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import './SealDetail.css';
 
@@ -131,11 +136,18 @@ class SealList extends Component {
             value={this.state.seal.excavation_number}
           />
           <h2>Content</h2>
+          <TagsDetail label="Languages" values={this.state.seal.languages} />
+          <NestedItemsDetail
+            label="Historical Relationships"
+            values={this.state.seal.historical_relationships}
+            nestedItemLabel="historical_person.name"
+            itemDetails={historicalRelationshipFields}
+          />
           <NestedItemsDetail
             label="Texts"
             values={this.state.seal.texts}
             nestedItemLabel="title"
-            itemDetails={textDetails}
+            itemDetails={textFields}
           />
           <h2>Design</h2>
           <CharDetail label="Design Type" value={this.state.seal.design_text} />
@@ -149,11 +161,19 @@ class SealList extends Component {
             label="Iconographic Elements"
             values={this.state.seal.iconographic_elements}
           />
+          <h2>Images</h2>
+          <NestedItemsDetail
+            label="Images"
+            values={this.state.seal.images}
+            nestedItemLabel="name"
+            itemDetails={imageFields}
+          />
+          <h2>Bibliography</h2>
           <NestedItemsDetail
             label="Publications"
             values={this.state.seal.publications}
             nestedItemLabel="title"
-            itemDetails={publicationDetails}
+            itemDetails={publicationFields}
           />
         </div>
       </Spin>

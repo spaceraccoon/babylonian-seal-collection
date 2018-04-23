@@ -7,6 +7,7 @@ from ..art_styles.models import ArtStyle
 from ..periods.models import Period
 from ..publications.models import Publication
 from ..texts.models import Text
+from ..languages.models import Language
 
 
 class Seal(models.Model):
@@ -59,8 +60,8 @@ class Seal(models.Model):
     excavation_number = models.CharField(blank=True, max_length=255)
 
     # content
+    languages = models.ManyToManyField(Language, blank=True)
     texts = models.ManyToManyField(Text, blank=True)
-    # historical_relationships
 
     # impressions
     # impressions
@@ -82,9 +83,6 @@ class Seal(models.Model):
     art_styles = models.ManyToManyField(ArtStyle, blank=True)
     iconographic_elements = models.ManyToManyField(
         IconographicElement, blank=True)
-
-    # images
-    # images
 
     # bibliography
     publications = models.ManyToManyField(

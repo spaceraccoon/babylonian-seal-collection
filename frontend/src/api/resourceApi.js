@@ -28,7 +28,7 @@ const setTokenInterceptor = () => {
           return axios(originalRequest);
         })
         .catch(error => {
-          console.log(error);
+          console.error(error);
           message.error('Failed to authenticate user. Please sign in again.');
         });
     }

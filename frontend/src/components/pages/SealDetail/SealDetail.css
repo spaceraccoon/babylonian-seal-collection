@@ -6,6 +6,12 @@
   text-align: right;
 }
 
+@media only screen and (max-width: 480px) {
+  .seal-detail__label {
+    text-align: left;
+  }
+}
+
 .seal-detail__label label::after {
   content: ':';
   margin: 0 8px 0 2px;

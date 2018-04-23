@@ -35,6 +35,7 @@ const nestedFormItemLayout = {
 const nestedFormItemLayoutWithoutLabel = {
   wrapperCol: {
     xs: { span: 24 },
+    lg: { span: 20, offset: 4 },
   },
 };
 

@@ -1,3 +1,5 @@
+// from https://github.com/ant-design/ant-design-pro-site/blob/master/site/theme/template/utils.jsx
+
 let enquireJs;
 if (typeof window !== 'undefined') {
   const matchMediaPolyfill = mediaQuery => {

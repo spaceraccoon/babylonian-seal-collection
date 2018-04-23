@@ -6,7 +6,7 @@ import DetailRow from '../DetailRow/DetailRow';
 class CharField extends Component {
   render() {
     return (
-      <DetailRow label={this.props.label}>
+      <DetailRow nested={this.props.nested} label={this.props.label}>
         {this.props.time ? (
           <Moment date={this.props.value} />
         ) : (

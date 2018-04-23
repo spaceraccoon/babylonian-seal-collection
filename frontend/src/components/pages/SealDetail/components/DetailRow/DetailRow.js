@@ -10,7 +10,7 @@ class DetailRow extends Component {
             <strong>{this.props.label}</strong>
           </label>
         </Col>
-        <Col xs={24} lg={12}>
+        <Col xs={24} lg={this.props.nested ? 20 : 12}>
           {this.props.children}
         </Col>
       </Row>

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Form, InputNumber } from 'antd';
 
 import { formItemLayout } from '../../data/formLayouts';
-import { floatFieldRules } from '../../data/fieldRules';
+import { numberRules } from '../../../../../data/fieldRules';
 
 const FormItem = Form.Item;
 
@@ -13,8 +13,8 @@ class FloatField extends Component {
       <FormItem {...formItemLayout} label={this.props.label}>
         {getFieldDecorator(this.props.field, {
           validateTrigger: ['onChange', 'onBlur'],
-          rules: [floatFieldRules],
-        })(<InputNumber step={0.01} />)}
+          rules: [numberRules],
+        })(<InputNumber min={0.01} step={0.01} />)}
       </FormItem>
     );
   }

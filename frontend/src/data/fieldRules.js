@@ -11,9 +11,9 @@ const requiredCharFieldRules = {
   message: 'This field is required!',
 };
 
-const floatFieldRules = {
-  min: 0,
-  type: 'number',
+const numberRules = {
+  validator: (rule, value, callback) =>
+    !value || (!isNaN(value) && value > 0) ? callback() : callback(false),
   message: 'Please input a positive value!',
 };
 
@@ -25,9 +25,4 @@ const tagsFieldRules = {
   message: 'Each entry should be a maximum of 255 characters!',
 };
 
-export {
-  charFieldRules,
-  requiredCharFieldRules,
-  floatFieldRules,
-  tagsFieldRules,
-};
+export { charFieldRules, requiredCharFieldRules, numberRules, tagsFieldRules };

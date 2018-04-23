@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Form, Select } from 'antd';
 
 import { formItemLayout } from '../../data/formLayouts';
-import { tagsFieldRules } from '../../data/fieldRules';
+import { tagsFieldRules } from '../../../../../data/fieldRules';
 
 const FormItem = Form.Item;
 const { Option } = Select;

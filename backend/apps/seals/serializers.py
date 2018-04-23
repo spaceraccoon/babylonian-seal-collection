@@ -9,6 +9,9 @@ from ..periods.models import Period
 from ..publications.models import Publication
 from ..texts.models import Text
 from ..languages.models import Language
+from ..images.models import Image
+from ..historical_persons.models import HistoricalPerson
+from ..historical_relationships.models import HistoricalRelationship
 from ..materials.serializers import MaterialSerializer
 from ..iconographic_elements.serializers import IconographicElementSerializer
 from ..scenes.serializers import SceneSerializer
@@ -16,10 +19,14 @@ from ..art_styles.serializers import ArtStyleSerializer
 from ..periods.serializers import PeriodSerializer
 from ..publications.serializers import PublicationSerializer
 from ..texts.serializers import TextSerializer
+from ..languages.serializers import LanguageSerializer
+from ..images.serializers import ImageSerializer
+from ..historical_relationships.serializers import HistoricalRelationshipSerializer
 
 
 def get_or_create_or_update(obj_id, defaults, model, user):
     try:
+        print(obj_id)
         obj = model.objects.get(id=obj_id)
         if obj.creator == user or user.is_staff or user.is_superuser:
             model.objects.filter(id=obj.id).update(**defaults)
@@ -40,7 +47,8 @@ class ListSealSerializer(serializers.ModelSerializer):
     creator_username = serializers.ReadOnlyField(source='creator.username')
 
     def get_can_edit(self, obj):
-        return obj.creator == self.context['request'].user or self.context['request'].user.is_staff or self.context['request'].user.is_superuser
+        user = self.context['request'].user
+        return obj.creator == user or user.is_staff or user.is_superuser
 
     class Meta:
         fields = (
@@ -58,17 +66,22 @@ class SealSerializer(serializers.ModelSerializer):
     creator_username = serializers.ReadOnlyField(source='creator.username')
     creator_id = serializers.ReadOnlyField(source='creator.id')
     surface_preservation_text = serializers.SerializerMethodField()
+    texts = TextSerializer(many=True)
+    historical_relationships = HistoricalRelationshipSerializer(
+        many=True, source='historicalrelationship_set')
     design_text = serializers.SerializerMethodField()
     materials = MaterialSerializer(many=True)
     iconographic_elements = IconographicElementSerializer(many=True)
     scenes = SceneSerializer(many=True)
     art_styles = ArtStyleSerializer(many=True)
     periods = PeriodSerializer(many=True)
+    images = ImageSerializer(many=True, source='image_set')
     publications = PublicationSerializer(many=True)
-    texts = TextSerializer(many=True)
+    languages = LanguageSerializer(many=True)
 
     def get_can_edit(self, obj):
-        return obj.creator == self.context['request'].user or self.context['request'].user.is_staff or self.context['request'].user.is_superuser
+        user = self.context['request'].user
+        return obj.creator == user or user.is_staff or user.is_superuser
 
     def get_surface_preservation_text(self, obj):
         return obj.get_surface_preservation_display()
@@ -106,6 +119,8 @@ class SealSerializer(serializers.ModelSerializer):
             'provenance',
             'provenance_remarks',
             'excavation_number',
+            'languages',
+            'historical_relationships',
             'texts',
             'design',
             'design_text',
@@ -113,6 +128,7 @@ class SealSerializer(serializers.ModelSerializer):
             'scenes',
             'art_styles',
             'iconographic_elements',
+            'images',
             'publications'
         )
         model = Seal
@@ -128,12 +144,16 @@ class SealSerializer(serializers.ModelSerializer):
             'art_styles', ArtStyle, validated_data)
         periods = map_objects_by_name(
             'periods', Period, validated_data)
+        languages = map_objects_by_name(
+            'languages', Language, validated_data)
+
+        user = self.context['request'].user
 
         if 'publications' in validated_data:
             publication_data = validated_data.pop('publications')
             publications = list(map(lambda x: Publication.objects.get_or_create(
                 id=x['id'],
-                defaults={'creator': self.context['request'].user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
+                defaults={'creator': user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
 
         if 'texts' in validated_data:
             text_data = validated_data.pop('texts')
@@ -141,7 +161,7 @@ class SealSerializer(serializers.ModelSerializer):
             for text in text_data:
                 new_text = Text.objects.get_or_create(
                     id=text['id'],
-                    defaults={'creator': self.context['request'].user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
+                    defaults={'creator': user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
                 languages = text['languages']
                 for language in languages:
                     new_language = Language.objects.get_or_create(
@@ -150,16 +170,43 @@ class SealSerializer(serializers.ModelSerializer):
                 new_text.save()
                 texts.append(new_text)
 
+        if 'image_set' in validated_data:
+            image_data = validated_data.pop('image_set')
+            image_set = list(map(lambda x: Image.objects.create(
+                **{'creator': user, 'name': x['name'], 'source': x['source'], 'description': x['description'], 's3_key': x['s3_key']}), image_data))
+
+        if 'historicalrelationship_set' in validated_data:
+            historicalrelationships_data = validated_data.pop(
+                'historicalrelationship_set')
+            historicalrelationships = []
+            for historicalrelationship_data in historicalrelationships_data:
+                historicalperson_data = historicalrelationship_data.pop(
+                    'historical_person')
+                historical_person = get_or_create_or_update(
+                    historicalperson_data.get('id', None),
+                    {
+                        'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']},
+                    HistoricalPerson,
+                    user)
+                historicalrelationship = HistoricalRelationship.objects.create(
+                    creator=user, remarks=historicalrelationship_data['remarks'], historical_person=historical_person)
+                historicalrelationships.append(historicalrelationship)
+
         seal = Seal.objects.create(**validated_data)
         seal.materials.set(materials)
         seal.iconographic_elements.set(iconographic_elements)
         seal.scenes.set(scenes)
         seal.art_styles.set(art_styles)
         seal.periods.set(periods)
+        seal.languages.set(languages)
         if publications:
             seal.publications.set(publications)
         if texts:
             seal.texts.set(texts)
+        if image_set:
+            seal.image_set.set(image_set)
+        if historicalrelationships:
+            seal.historicalrelationship_set.set(historicalrelationships)
         seal.save()
         return seal
 
@@ -174,11 +221,14 @@ class SealSerializer(serializers.ModelSerializer):
             'art_styles', ArtStyle, validated_data)
         periods = map_objects_by_name(
             'periods', Period, validated_data)
+        languages = map_objects_by_name(
+            'languages', Language, validated_data)
         instance.materials.set(materials)
         instance.iconographic_elements.set(iconographic_elements)
         instance.scenes.set(scenes)
         instance.art_styles.set(art_styles)
         instance.periods.set(periods)
+        instance.languages.set(languages)
 
         user = self.context['request'].user
 
@@ -219,6 +269,41 @@ class SealSerializer(serializers.ModelSerializer):
                     new_text.save()
                     texts.append(new_text)
             instance.texts.set(texts)
+
+        if 'image_set' in validated_data:
+            image_data = validated_data.pop('image_set')
+            image_set = list(map(lambda x: get_or_create_or_update(
+                x['id'],
+                {'name': x['name'], 'source': x['source'],
+                    'description': x['description'], 's3_key': x['s3_key']},
+                Image,
+                user), image_data))
+            instance.image_set.set(image_set)
+
+        if 'historicalrelationship_set' in validated_data:
+            historicalrelationships_data = validated_data.pop(
+                'historicalrelationship_set')
+            historicalrelationships = []
+            for historicalrelationship_data in historicalrelationships_data:
+                historicalperson_data = historicalrelationship_data.pop(
+                    'historical_person')
+                historical_person = get_or_create_or_update(
+                    historicalperson_data.get('id', None),
+                    {
+                        'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']
+                    },
+                    HistoricalPerson,
+                    user)
+                historicalrelationship = get_or_create_or_update(
+                    historicalrelationship_data.get('id', None),
+                    {
+                        'remarks': historicalrelationship_data['remarks'],
+                        'historical_person': historical_person
+                    },
+                    HistoricalRelationship,
+                    user)
+                historicalrelationships.append(historicalrelationship)
+            instance.historicalrelationship_set.set(historicalrelationships)
 
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(
