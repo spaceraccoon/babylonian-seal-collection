@@ -106,10 +106,14 @@ class ImpressionList extends Component {
             label="Collection"
             value={this.state.impression.collection}
           />
-          <CharDetail
-            label="Seal"
-            link={`/seal/${this.state.impression.seal}`}
-            value={this.state.impression.seal_name}
+          <h2>Relationships</h2>
+          <TagDetail
+            label="Created from Seal"
+            link="seal"
+            value={{
+              id: this.state.impression.seal,
+              name: this.state.impression.seal_name,
+            }}
           />
           <h2>Physical</h2>
           <CharDetail

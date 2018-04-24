@@ -7,6 +7,7 @@ import CharField from '../CharField/CharField';
 import FloatField from '../FloatField/FloatField';
 import TagField from '../TagField/TagField';
 import TagsField from '../TagsField/TagsField';
+import MultiSelectField from '../MultiSelectField/MultiSelectField';
 import NestedItemsField from '../NestedItemsField/NestedItemsField';
 import {
   formItemLayout,
@@ -29,16 +30,16 @@ const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-const mapNamesToObject = names =>
-  names.map(name => {
+const mapPropertyToObject = (propertyArray, property) =>
+  propertyArray.map(propertyItem => {
     return {
-      name,
+      [property]: propertyItem,
     };
   });
 
-const mapNameToFormField = field =>
+const mapPropertyToFormField = (field, property) =>
   Form.createFormField({
-    value: field.map(item => item.name),
+    value: field.map(item => _.get(item, property)),
   });
 
 const remapNestedItems = (field, nestedItemKey) =>
@@ -75,6 +76,7 @@ class SealForm extends Component {
     images: [],
     historicalPersons: [],
     objectTypes: [],
+    impressions: [],
   };
 
   handleSubmit = e => {
@@ -83,18 +85,21 @@ class SealForm extends Component {
       if (!err) {
         values = {
           ...values,
-          materials: mapNamesToObject(values.materials),
-          iconographic_elements: mapNamesToObject(values.iconographic_elements),
-          scenes: mapNamesToObject(values.scenes),
-          art_styles: mapNamesToObject(values.art_styles),
-          periods: mapNamesToObject(values.periods),
+          materials: mapPropertyToObject(values.materials, 'name'),
+          iconographic_elements: mapPropertyToObject(
+            values.iconographic_elements,
+            'name'
+          ),
+          scenes: mapPropertyToObject(values.scenes, 'name'),
+          art_styles: mapPropertyToObject(values.art_styles, 'name'),
+          periods: mapPropertyToObject(values.periods, 'name'),
           publications: values.publications || [],
-          languages: mapNamesToObject(values.languages),
+          languages: mapPropertyToObject(values.languages, 'name'),
           texts: values.texts
             ? values.texts.map(text => {
                 return {
                   ...text,
-                  languages: mapNamesToObject(text.languages),
+                  languages: mapPropertyToObject(text.languages, 'name'),
                 };
               })
             : [],
@@ -104,6 +109,7 @@ class SealForm extends Component {
             values.object_type && values.object_type.length > 0
               ? { name: values.object_type }
               : null,
+          impressions: mapPropertyToObject(values.impressions, 'id'),
         };
         console.log(values);
         if (this.props.edit) {
@@ -133,6 +139,7 @@ class SealForm extends Component {
       languages: await fetchResources('language'),
       historicalPersons: await mapHistoricalPersonOptions(),
       objectTypes: await fetchResources('objecttype'),
+      impressions: await fetchResources('impression'),
       isLoading: false,
     });
   }
@@ -180,6 +187,13 @@ class SealForm extends Component {
             form={this.props.form}
             label="Collection"
             field="collection"
+          />
+          <h2>Relationships</h2>
+          <MultiSelectField
+            form={this.props.form}
+            label="Impressions"
+            field="impressions"
+            options={this.state.impressions}
           />
           <h2>Physical</h2>
           <FloatField
@@ -394,7 +408,10 @@ const WrappedSealForm = Form.create({
             'languages',
           ].includes(key)
         ) {
-          return mapNameToFormField(field);
+          return mapPropertyToFormField(field, 'name');
+        }
+        if (key === 'impressions') {
+          return mapPropertyToFormField(field, 'id');
         }
         if (key === 'object_type') {
           return Form.createFormField({

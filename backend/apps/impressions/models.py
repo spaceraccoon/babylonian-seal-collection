@@ -24,7 +24,7 @@ class Impression(models.Model):
     publication_number = models.CharField(blank=True, max_length=255)
     collection = models.CharField(blank=True, max_length=255)
     seal = models.ForeignKey(
-        Seal, on_delete=models.SET_NULL, blank=True, null=True)
+        Seal, related_name='impressions', on_delete=models.SET_NULL, blank=True, null=True)
 
     # physical
     length = models.FloatField(blank=True, null=True)

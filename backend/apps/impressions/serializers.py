@@ -37,6 +37,7 @@ def map_objects_by_name(name, model, validated_data):
 
 
 class ListImpressionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
     seal_name = serializers.ReadOnlyField(source='seal.name')
@@ -115,7 +116,6 @@ class ImpressionSerializer(serializers.ModelSerializer):
         model = Impression
 
     def create(self, validated_data):
-        print(validated_data)
         materials = map_objects_by_name(
             'materials', Material, validated_data)
         periods = map_objects_by_name(

@@ -174,7 +174,7 @@ class ImpressionForm extends Component {
             label="Collection"
             field="collection"
           />
-          <FormItem {...formItemLayout} label="Seal">
+          <FormItem {...formItemLayout} label="Created from Seal">
             {getFieldDecorator('seal')(
               <Select>
                 {this.state.seals.map(seal => (

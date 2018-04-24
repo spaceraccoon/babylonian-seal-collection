@@ -13,6 +13,7 @@ from ..images.models import Image
 from ..historical_persons.models import HistoricalPerson
 from ..historical_relationships.models import HistoricalRelationship
 from ..object_types.models import ObjectType
+from ..impressions.models import Impression
 from ..materials.serializers import MaterialSerializer
 from ..iconographic_elements.serializers import IconographicElementSerializer
 from ..scenes.serializers import SceneSerializer
@@ -24,6 +25,7 @@ from ..languages.serializers import LanguageSerializer
 from ..images.serializers import ImageSerializer
 from ..historical_relationships.serializers import HistoricalRelationshipSerializer
 from ..object_types.serializers import ObjectTypeSerializer
+from ..impressions.serializers import ListImpressionSerializer
 
 
 def get_or_create_or_update(obj_id, defaults, model, user):
@@ -80,6 +82,7 @@ class SealSerializer(serializers.ModelSerializer):
     publications = PublicationSerializer(many=True)
     languages = LanguageSerializer(many=True)
     object_type = ObjectTypeSerializer(allow_null=True)
+    impressions = ListImpressionSerializer(many=True)
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -132,7 +135,8 @@ class SealSerializer(serializers.ModelSerializer):
             'iconographic_elements',
             'images',
             'publications',
-            'object_type'
+            'object_type',
+            'impressions'
         )
         model = Seal
 
@@ -308,6 +312,9 @@ class SealSerializer(serializers.ModelSerializer):
                 user)
             historical_relationships.append(historical_relationship)
         instance.historical_relationships.set(historical_relationships)
+
+        instance.impressions.set(list(map(lambda x: Impression.objects.get(
+            id=x['id']), validated_data.pop('impressions'))))
 
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(

@@ -96,6 +96,12 @@ class SealList extends Component {
             value={this.state.seal.publication_number}
           />
           <CharDetail label="Collection" value={this.state.seal.collection} />
+          <h2>Relationships</h2>
+          <TagsDetail
+            link="impression"
+            label="Impressions"
+            values={this.state.seal.impressions}
+          />
           <h2>Physical</h2>
           <CharDetail label="Height (mm)" value={this.state.seal.height} />
           <CharDetail
