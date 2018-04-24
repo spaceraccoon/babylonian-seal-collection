@@ -12,6 +12,7 @@ from ..languages.models import Language
 from ..images.models import Image
 from ..historical_persons.models import HistoricalPerson
 from ..historical_relationships.models import HistoricalRelationship
+from ..object_types.models import ObjectType
 from ..materials.serializers import MaterialSerializer
 from ..iconographic_elements.serializers import IconographicElementSerializer
 from ..scenes.serializers import SceneSerializer
@@ -22,6 +23,7 @@ from ..texts.serializers import TextSerializer
 from ..languages.serializers import LanguageSerializer
 from ..images.serializers import ImageSerializer
 from ..historical_relationships.serializers import HistoricalRelationshipSerializer
+from ..object_types.serializers import ObjectTypeSerializer
 
 
 def get_or_create_or_update(obj_id, defaults, model, user):
@@ -78,6 +80,7 @@ class SealSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True, source='image_set')
     publications = PublicationSerializer(many=True)
     languages = LanguageSerializer(many=True)
+    object_type = ObjectTypeSerializer(allow_null=True)
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -129,7 +132,8 @@ class SealSerializer(serializers.ModelSerializer):
             'art_styles',
             'iconographic_elements',
             'images',
-            'publications'
+            'publications',
+            'object_type'
         )
         model = Seal
 
@@ -147,50 +151,51 @@ class SealSerializer(serializers.ModelSerializer):
         languages = map_objects_by_name(
             'languages', Language, validated_data)
 
+        object_type_data = validated_data.pop('object_type')
+        if object_type_data != None:
+            object_type = ObjectType.objects.get_or_create(
+                name=object_type_data['name'])[0]
+
         user = self.context['request'].user
 
-        if 'publications' in validated_data:
-            publication_data = validated_data.pop('publications')
-            publications = list(map(lambda x: Publication.objects.get_or_create(
-                id=x['id'],
-                defaults={'creator': user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
+        publication_data = validated_data.pop('publications')
+        publications = list(map(lambda x: Publication.objects.get_or_create(
+            id=x['id'],
+            defaults={'creator': user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
 
-        if 'texts' in validated_data:
-            text_data = validated_data.pop('texts')
-            texts = []
-            for text in text_data:
-                new_text = Text.objects.get_or_create(
-                    id=text['id'],
-                    defaults={'creator': user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
-                languages = text['languages']
-                for language in languages:
-                    new_language = Language.objects.get_or_create(
-                        name=language['name'])[0]
-                    new_text.languages.add(new_language)
-                new_text.save()
-                texts.append(new_text)
+        text_data = validated_data.pop('texts')
+        texts = []
+        for text in text_data:
+            new_text = Text.objects.get_or_create(
+                id=text['id'],
+                defaults={'creator': user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
+            languages = text['languages']
+            for language in languages:
+                new_language = Language.objects.get_or_create(
+                    name=language['name'])[0]
+                new_text.languages.add(new_language)
+            new_text.save()
+            texts.append(new_text)
 
-        if 'image_set' in validated_data:
-            image_data = validated_data.pop('image_set')
-            image_set = list(map(lambda x: Image.objects.create(
-                **{'creator': user, 'name': x['name'], 'source': x['source'], 'description': x['description'], 's3_key': x['s3_key']}), image_data))
+        image_data = validated_data.pop('image_set')
+        image_set = list(map(lambda x: Image.objects.create(
+            **{'creator': user, 'name': x['name'], 'source': x['source'], 'description': x['description'], 's3_key': x['s3_key']}), image_data))
 
-        if 'historicalrelationship_set' in validated_data:
-            historicalrelationships_data = validated_data.pop(
-                'historicalrelationship_set')
-            historicalrelationships = []
-            for historicalrelationship_data in historicalrelationships_data:
-                historicalperson_data = historicalrelationship_data.pop(
-                    'historical_person')
-                historical_person = get_or_create_or_update(
-                    historicalperson_data.get('id', None),
-                    {
-                        'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']},
-                    HistoricalPerson,
-                    user)
-                historicalrelationship = HistoricalRelationship.objects.create(
-                    creator=user, remarks=historicalrelationship_data['remarks'], historical_person=historical_person)
-                historicalrelationships.append(historicalrelationship)
+        historicalrelationships_data = validated_data.pop(
+            'historicalrelationship_set')
+        historicalrelationships = []
+        for historicalrelationship_data in historicalrelationships_data:
+            historicalperson_data = historicalrelationship_data.pop(
+                'historical_person')
+            historical_person = get_or_create_or_update(
+                historicalperson_data.get('id', None),
+                {
+                    'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']},
+                HistoricalPerson,
+                user)
+            historicalrelationship = HistoricalRelationship.objects.create(
+                creator=user, remarks=historicalrelationship_data['remarks'], historical_person=historical_person)
+            historicalrelationships.append(historicalrelationship)
 
         seal = Seal.objects.create(**validated_data)
         seal.materials.set(materials)
@@ -199,14 +204,12 @@ class SealSerializer(serializers.ModelSerializer):
         seal.art_styles.set(art_styles)
         seal.periods.set(periods)
         seal.languages.set(languages)
-        if publications:
-            seal.publications.set(publications)
-        if texts:
-            seal.texts.set(texts)
-        if image_set:
-            seal.image_set.set(image_set)
-        if historicalrelationships:
-            seal.historicalrelationship_set.set(historicalrelationships)
+        seal.publications.set(publications)
+        seal.texts.set(texts)
+        seal.image_set.set(image_set)
+        seal.historicalrelationship_set.set(historicalrelationships)
+        if object_type_data != None:
+            seal.object_type = object_type
         seal.save()
         return seal
 
@@ -230,80 +233,82 @@ class SealSerializer(serializers.ModelSerializer):
         instance.periods.set(periods)
         instance.languages.set(languages)
 
+        object_type_data = validated_data.pop('object_type')
+        if object_type_data:
+            object_type = ObjectType.objects.get_or_create(
+                name=object_type_data['name'])[0]
+            instance.object_type = object_type
+
         user = self.context['request'].user
 
-        if 'publications' in validated_data:
-            publication_data = validated_data.pop('publications')
-            publications = list(map(lambda x: get_or_create_or_update(
-                x['id'],
-                {'title': x['title'], 'author': x.get(
-                    'author', ''), 'year': x['year'], 'isbn': x['isbn']},
-                Publication,
-                user), publication_data))
-            instance.publications.set(publications)
+        publication_data = validated_data.pop('publications')
+        publications = list(map(lambda x: get_or_create_or_update(
+            x['id'],
+            {'title': x['title'], 'author': x.get(
+                'author', ''), 'year': x['year'], 'isbn': x['isbn']},
+            Publication,
+            user), publication_data))
+        instance.publications.set(publications)
 
-        if 'texts' in validated_data:
-            text_data = validated_data.pop('texts')
-            texts = []
-            for text in text_data:
-                languages = []
-                for language in text['languages']:
-                    languages.append(Language.objects.get_or_create(
-                        name=language['name'])[0])
-                try:
-                    old_text = Text.objects.get(id=text['id'])
-                    if old_text.creator == user or user.is_staff or user.is_superuser:
-                        old_text.languages.set(languages)
-                        old_text.save()
-                        Text.objects.filter(id=text['id']).update(title=text['title'],
-                                                                  transliteration=text.get(
-                                                                      'transliteration', ''),
-                                                                  translation=text.get('translation', ''))
-                        texts.append(Text.objects.get(id=text['id']))
-                    else:
-                        texts.append(old_text)
-                except Text.DoesNotExist:
-                    new_text = Text.objects.create(creator=user, title=text['title'], transliteration=text.get(
-                        'transliteration', ''), translation=text.get('translation', ''))
-                    new_text.languages.set(languages)
-                    new_text.save()
-                    texts.append(new_text)
-            instance.texts.set(texts)
+        text_data = validated_data.pop('texts')
+        texts = []
+        for text in text_data:
+            languages = []
+            for language in text['languages']:
+                languages.append(Language.objects.get_or_create(
+                    name=language['name'])[0])
+            try:
+                old_text = Text.objects.get(id=text['id'])
+                if old_text.creator == user or user.is_staff or user.is_superuser:
+                    old_text.languages.set(languages)
+                    old_text.save()
+                    Text.objects.filter(id=text['id']).update(title=text['title'],
+                                                              transliteration=text.get(
+                        'transliteration', ''),
+                        translation=text.get('translation', ''))
+                    texts.append(Text.objects.get(id=text['id']))
+                else:
+                    texts.append(old_text)
+            except Text.DoesNotExist:
+                new_text = Text.objects.create(creator=user, title=text['title'], transliteration=text.get(
+                    'transliteration', ''), translation=text.get('translation', ''))
+                new_text.languages.set(languages)
+                new_text.save()
+                texts.append(new_text)
+        instance.texts.set(texts)
 
-        if 'image_set' in validated_data:
-            image_data = validated_data.pop('image_set')
-            image_set = list(map(lambda x: get_or_create_or_update(
-                x['id'],
-                {'name': x['name'], 'source': x['source'],
-                    'description': x['description'], 's3_key': x['s3_key']},
-                Image,
-                user), image_data))
-            instance.image_set.set(image_set)
+        image_data = validated_data.pop('image_set')
+        image_set = list(map(lambda x: get_or_create_or_update(
+            x['id'],
+            {'name': x['name'], 'source': x['source'],
+                'description': x['description'], 's3_key': x['s3_key']},
+            Image,
+            user), image_data))
+        instance.image_set.set(image_set)
 
-        if 'historicalrelationship_set' in validated_data:
-            historicalrelationships_data = validated_data.pop(
-                'historicalrelationship_set')
-            historicalrelationships = []
-            for historicalrelationship_data in historicalrelationships_data:
-                historicalperson_data = historicalrelationship_data.pop(
-                    'historical_person')
-                historical_person = get_or_create_or_update(
-                    historicalperson_data.get('id', None),
-                    {
-                        'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']
-                    },
-                    HistoricalPerson,
-                    user)
-                historicalrelationship = get_or_create_or_update(
-                    historicalrelationship_data.get('id', None),
-                    {
-                        'remarks': historicalrelationship_data['remarks'],
-                        'historical_person': historical_person
-                    },
-                    HistoricalRelationship,
-                    user)
-                historicalrelationships.append(historicalrelationship)
-            instance.historicalrelationship_set.set(historicalrelationships)
+        historicalrelationships_data = validated_data.pop(
+            'historicalrelationship_set')
+        historicalrelationships = []
+        for historicalrelationship_data in historicalrelationships_data:
+            historicalperson_data = historicalrelationship_data.pop(
+                'historical_person')
+            historical_person = get_or_create_or_update(
+                historicalperson_data.get('id', None),
+                {
+                    'name': historicalperson_data['name'], 'remarks': historicalperson_data['remarks']
+                },
+                HistoricalPerson,
+                user)
+            historicalrelationship = get_or_create_or_update(
+                historicalrelationship_data.get('id', None),
+                {
+                    'remarks': historicalrelationship_data['remarks'],
+                    'historical_person': historical_person
+                },
+                HistoricalRelationship,
+                user)
+            historicalrelationships.append(historicalrelationship)
+        instance.historicalrelationship_set.set(historicalrelationships)
 
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(

@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/text/', include('backend.apps.texts.urls')),
     path('api/image/', include('backend.apps.images.urls')),
     path('api/historicalperson/', include('backend.apps.historical_persons.urls')),
+    path('api/objecttype/', include('backend.apps.object_types.urls')),
     path('api/auth/token/obtain/', TokenObtainPairView.as_view()),
     path('api/auth/token/refresh/', TokenRefreshView.as_view()),
     re_path('.*', TemplateView.as_view(template_name='index.html')),

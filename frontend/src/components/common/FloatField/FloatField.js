@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Form, InputNumber } from 'antd';
 
-import { formItemLayout } from '../../data/formLayouts';
-import { numberRules } from '../../../../../data/fieldRules';
+import { formItemLayout } from '../../../data/formLayouts';
+import { numberRules } from '../../../data/fieldRules';
 
 const FormItem = Form.Item;
 

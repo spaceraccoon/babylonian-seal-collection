@@ -1,13 +1,17 @@
 import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
 import { Button, Form, Input, message, Radio, Select, Spin } from 'antd';
-import { Redirect } from 'react-router-dom';
+import { Redirect, Link } from 'react-router-dom';
 import './SealForm.css';
-import CharField from './components/CharField/CharField';
-import FloatField from './components/FloatField/FloatField';
-import TagsField from './components/TagsField/TagsField';
-import NestedItemsField from './components/NestedItemsField/NestedItemsField';
-import { formItemLayout, formItemLayoutWithoutLabel } from './data/formLayouts';
+import CharField from '../CharField/CharField';
+import FloatField from '../FloatField/FloatField';
+import TagField from '../TagField/TagField';
+import TagsField from '../TagsField/TagsField';
+import NestedItemsField from '../NestedItemsField/NestedItemsField';
+import {
+  formItemLayout,
+  formItemLayoutWithoutLabel,
+} from '../../../data/formLayouts';
 import {
   publicationFields,
   textFields,
@@ -70,6 +74,7 @@ class SealForm extends Component {
     languages: [],
     images: [],
     historicalPersons: [],
+    objectTypes: [],
   };
 
   handleSubmit = e => {
@@ -95,6 +100,10 @@ class SealForm extends Component {
             : [],
           images: values.images || [],
           historical_relationships: values.historical_relationships || [],
+          object_type:
+            values.object_type && values.object_type.length > 0
+              ? { name: values.object_type }
+              : null,
         };
         console.log(values);
         if (this.props.edit) {
@@ -123,6 +132,7 @@ class SealForm extends Component {
       texts: await fetchResources('text'),
       languages: await fetchResources('language'),
       historicalPersons: await mapHistoricalPersonOptions(),
+      objectTypes: await fetchResources('objecttype'),
       isLoading: false,
     });
   }
@@ -225,6 +235,12 @@ class SealForm extends Component {
               </RadioGroup>
             )}
           </FormItem>
+          <TagField
+            form={this.props.form}
+            label="Object Type"
+            field="object_type"
+            options={this.state.objectTypes}
+          />
           <FormItem {...formItemLayout} label="Physical Remarks">
             {getFieldDecorator('physical_remarks')(<TextArea rows={4} />)}
           </FormItem>
@@ -339,13 +355,24 @@ class SealForm extends Component {
             />
           )}
           <FormItem {...formItemLayoutWithoutLabel}>
-            <Button type="primary" htmlType="submit">
+            <Button
+              className="seal-form__button"
+              type="primary"
+              htmlType="submit"
+            >
               {this.props.edit ? (
                 <Fragment>Update</Fragment>
               ) : (
                 <Fragment>Create</Fragment>
               )}
             </Button>
+            <Link
+              to={
+                (this.props.location && this.props.location.state.from) || '/'
+              }
+            >
+              <Button>Cancel</Button>
+            </Link>
           </FormItem>
         </Form>
       </Spin>
@@ -368,6 +395,11 @@ const WrappedSealForm = Form.create({
           ].includes(key)
         ) {
           return mapNameToFormField(field);
+        }
+        if (key === 'object_type') {
+          return Form.createFormField({
+            value: field ? field.name : '',
+          });
         }
         if (key === 'texts') {
           return Form.createFormField({

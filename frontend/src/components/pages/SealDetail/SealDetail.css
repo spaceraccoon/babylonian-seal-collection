@@ -2,6 +2,10 @@
   margin-bottom: 4px;
 }
 
+.seal-detail__button {
+  margin: 0 4px 0 24px;
+}
+
 .seal-detail__label {
   text-align: right;
 }

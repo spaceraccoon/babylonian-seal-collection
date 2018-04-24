@@ -15,8 +15,8 @@ import _ from 'lodash';
 import {
   formItemLayoutWithoutLabel,
   nestedFormItemLayout,
-} from '../../../../data/formLayouts';
-import { fetchSignedUrl } from '../../../../../../../api/uploadApi';
+} from '../../../../../data/formLayouts';
+import { fetchSignedUrl } from '../../../../../api/uploadApi';
 
 const { Option } = Select;
 const { Panel } = Collapse;

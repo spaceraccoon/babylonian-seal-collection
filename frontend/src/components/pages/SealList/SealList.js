@@ -47,7 +47,12 @@ class SealList extends Component {
               </Link>
               {seal.can_edit && (
                 <Fragment>
-                  <Link to={`/seal/${id}/edit`}>
+                  <Link
+                    to={{
+                      pathname: `/seal/${id}/edit`,
+                      state: { from: this.props.location },
+                    }}
+                  >
                     <Button className="seal-table__button" type="primary">
                       Edit
                     </Button>

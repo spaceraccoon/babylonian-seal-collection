@@ -5,7 +5,7 @@ class SealCreate extends Component {
   render() {
     return (
       <div className="content-body">
-        <SealForm />
+        <SealForm {...this.props} />
       </div>
     );
   }

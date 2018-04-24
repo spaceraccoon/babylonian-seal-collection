@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Modal } from 'antd';
 
 import DetailRow from '../DetailRow/DetailRow';
-import { fetchSignedUrl } from '../../../../../api/uploadApi';
+import { fetchSignedUrl } from '../../../api/uploadApi';
 
 class ImageDetail extends Component {
   state = {

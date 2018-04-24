@@ -8,6 +8,7 @@ from ..periods.models import Period
 from ..publications.models import Publication
 from ..texts.models import Text
 from ..languages.models import Language
+from ..object_types.models import ObjectType
 
 
 class Seal(models.Model):
@@ -51,7 +52,8 @@ class Seal(models.Model):
     condition = models.TextField(blank=True)
     is_recarved = models.NullBooleanField(blank=True, null=True)
     physical_remarks = models.TextField(blank=True)
-    # type
+    object_type = models.ForeignKey(
+        ObjectType, on_delete=models.SET_NULL, blank=True, null=True)
 
     # provenance
     periods = models.ManyToManyField(Period, blank=True)

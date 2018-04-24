@@ -1,3 +1,7 @@
+.seal-form__button {
+  margin-right: 4px;
+}
+
 .dynamic-delete-button {
   cursor: pointer;
   margin-right: 16px;

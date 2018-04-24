@@ -14,7 +14,7 @@ const requiredCharFieldRules = {
 const numberRules = {
   validator: (rule, value, callback) =>
     !value || (!isNaN(value) && value > 0) ? callback() : callback(false),
-  message: 'Please input a positive value!',
+  message: 'Please input a valid number!',
 };
 
 const tagsFieldRules = {

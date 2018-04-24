@@ -4,6 +4,7 @@ import {
   charFieldRules,
   requiredCharFieldRules,
   tagsFieldRules,
+  numberRules,
 } from './fieldRules';
 
 const publicationFields = [
@@ -29,14 +30,13 @@ const publicationFields = [
     label: 'Year',
     field: 'year',
     rules: [
+      numberRules,
       {
         validator: (rule, value, callback) =>
-          !value || (!isNaN(value) && value > 0) ? callback() : callback(false),
-        range: {
-          min: 0,
-          max: new Date().getFullYear(),
-        },
-        message: 'Please enter a valid year!',
+          !value || value.toString().length === 4
+            ? callback()
+            : callback(false),
+        message: 'Please enter in format YYYY!',
       },
     ],
   },

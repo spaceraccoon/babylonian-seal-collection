@@ -6,7 +6,7 @@ import pluralize from 'pluralize';
 import {
   formItemLayout,
   formItemLayoutWithoutLabel,
-} from '../../data/formLayouts';
+} from '../../../data/formLayouts';
 import NestedItem from './components/NestedItem/NestedItem';
 
 const { Option } = Select;

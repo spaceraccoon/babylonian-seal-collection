@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'backend.apps.images',
     'backend.apps.historical_relationships',
     'backend.apps.historical_persons',
+    'backend.apps.object_types',
 ]
 
 REST_FRAMEWORK = {

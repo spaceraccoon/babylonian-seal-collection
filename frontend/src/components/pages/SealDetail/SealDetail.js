@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react';
 import { Button, Popconfirm, Spin } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
 
-import CharDetail from './components/CharDetail/CharDetail';
-import TagsDetail from './components/TagsDetail/TagsDetail';
-import NestedItemsDetail from './components/NestedItemsDetail/NestedItemsDetail';
+import CharDetail from '../../common/CharDetail/CharDetail';
+import TagDetail from '../../common/TagDetail/TagDetail';
+import TagsDetail from '../../common/TagsDetail/TagsDetail';
+import NestedItemsDetail from '../../common/NestedItemsDetail/NestedItemsDetail';
 import {
   publicationFields,
   textFields,
@@ -38,8 +39,13 @@ class SealList extends Component {
           <h1 style={{ display: 'inline-block' }}>{this.state.seal.name}</h1>
           {this.state.seal.can_edit && (
             <Fragment>
-              <Link to={`/seal/${this.state.seal.id}/edit`}>
-                <Button type="primary" style={{ margin: '0 4px 0 24px' }}>
+              <Link
+                to={{
+                  pathname: `/seal/${this.state.seal.id}/edit`,
+                  state: { from: this.props.location },
+                }}
+              >
+                <Button type="primary" className="seal-detail__button">
                   Edit
                 </Button>
               </Link>
@@ -120,6 +126,7 @@ class SealList extends Component {
                 : null
             }
           />
+          <TagDetail label="Object Type" value={this.state.seal.object_type} />
           <CharDetail
             label="Physical Remarks"
             value={this.state.seal.physical_remarks}

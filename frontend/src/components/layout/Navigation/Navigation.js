@@ -53,7 +53,14 @@ class Navigation extends Component {
           <Link to="/">Home</Link>
         </Menu.Item>
         <Menu.Item key="2">
-          <Link to="/seal/create">Create Seal</Link>
+          <Link
+            to={{
+              pathname: '/seal/create',
+              state: { from: this.props.location },
+            }}
+          >
+            Create Seal
+          </Link>
         </Menu.Item>
         {localStorage.accessToken ? (
           <Menu.Item key="3" style={{ float: 'right' }}>
