@@ -1,0 +1,28 @@
+.impression-detail {
+  margin-bottom: 4px;
+}
+
+.impression-detail__button {
+  margin: 0 4px 0 24px;
+}
+
+.impression-detail__label {
+  text-align: right;
+}
+
+@media only screen and (max-width: 480px) {
+  .impression-detail__label {
+    text-align: left;
+  }
+}
+
+.impression-detail__label label::after {
+  content: ':';
+  margin: 0 8px 0 2px;
+  position: relative;
+  top: -0.5px;
+}
+
+.impression-detail .ant-collapse {
+  margin-bottom: 4px;
+}

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Collapse } from 'antd';
+import _ from 'lodash';
 
 import DetailRow from '../DetailRow/DetailRow';
 import CharDetail from '../CharDetail/CharDetail';
@@ -17,7 +18,7 @@ class NestedItemsDetail extends Component {
               <Collapse defaultActiveKey={null} key={value.id}>
                 <Panel
                   header={
-                    value[this.props.nestedItemLabel] ||
+                    _.get(value, this.props.nestedItemLabel) ||
                     `${this.props.label} ${value.id}`
                   }
                 >
@@ -29,7 +30,7 @@ class NestedItemsDetail extends Component {
                             nested={true}
                             key={itemDetail.field}
                             label={itemDetail.label}
-                            values={value[itemDetail.field]}
+                            values={_.get(value, itemDetail.field)}
                           />
                         );
                       case 'image':
@@ -38,7 +39,7 @@ class NestedItemsDetail extends Component {
                             nested={true}
                             key={itemDetail.field}
                             label={itemDetail.label}
-                            value={value[itemDetail.field]}
+                            value={_.get(value, itemDetail.field)}
                           />
                         );
                       default:
@@ -47,7 +48,7 @@ class NestedItemsDetail extends Component {
                             nested={true}
                             key={itemDetail.field}
                             label={itemDetail.label}
-                            value={value[itemDetail.field]}
+                            value={_.get(value, itemDetail.field)}
                           />
                         );
                     }

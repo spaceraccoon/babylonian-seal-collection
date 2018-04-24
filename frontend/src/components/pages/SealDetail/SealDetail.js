@@ -168,7 +168,7 @@ class SealList extends Component {
             label="Iconographic Elements"
             values={this.state.seal.iconographic_elements}
           />
-          <h2>Images</h2>
+          <h2>Uploads</h2>
           <NestedItemsDetail
             label="Images"
             values={this.state.seal.images}

@@ -1,0 +1,7 @@
+tr.impression-table__row:hover > td {
+  background: none;
+}
+
+.impression-table__button {
+  margin-right: 4px;
+}

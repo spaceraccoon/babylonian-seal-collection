@@ -7,6 +7,10 @@ import SealList from '../../pages/SealList/SealList';
 import SealDetail from '../../pages/SealDetail/SealDetail';
 import SealCreate from '../../pages/SealCreate/SealCreate';
 import SealEdit from '../../pages/SealEdit/SealEdit';
+import ImpressionList from '../../pages/ImpressionList/ImpressionList';
+import ImpressionDetail from '../../pages/ImpressionDetail/ImpressionDetail';
+import ImpressionCreate from '../../pages/ImpressionCreate/ImpressionCreate';
+import ImpressionEdit from '../../pages/ImpressionEdit/ImpressionEdit';
 import SignIn from '../../pages/SignIn/SignIn';
 
 import './App.css';
@@ -46,6 +50,17 @@ class App extends Component {
             <PrivateRoute exact path="/seal/create" component={SealCreate} />
             <PrivateRoute path="/seal/:id/edit" component={SealEdit} />
             <Route path="/seal/:id" component={SealDetail} />
+            <Route exact path="/impression" component={ImpressionList} />
+            <PrivateRoute
+              exact
+              path="/impression/create"
+              component={ImpressionCreate}
+            />
+            <PrivateRoute
+              path="/impression/:id/edit"
+              component={ImpressionEdit}
+            />
+            <Route path="/impression/:id" component={ImpressionDetail} />
             <Route exact path="/signin" component={SignIn} />
           </Switch>
         </Content>

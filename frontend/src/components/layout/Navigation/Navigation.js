@@ -62,14 +62,27 @@ class Navigation extends Component {
             Create Seal
           </Link>
         </Menu.Item>
+        <Menu.Item key="3">
+          <Link to="/impression">Impressions</Link>
+        </Menu.Item>
+        <Menu.Item key="4">
+          <Link
+            to={{
+              pathname: '/impression/create',
+              state: { from: this.props.location },
+            }}
+          >
+            Create Impression
+          </Link>
+        </Menu.Item>
         {localStorage.accessToken ? (
-          <Menu.Item key="3" style={{ float: 'right' }}>
+          <Menu.Item key="5" style={{ float: 'right' }}>
             <a href="/" onClick={signOut}>
               Sign Out
             </a>
           </Menu.Item>
         ) : (
-          <Menu.Item key="3" style={{ float: 'right' }}>
+          <Menu.Item key="5" style={{ float: 'right' }}>
             <Link to="/signin">Sign In</Link>
           </Menu.Item>
         )}

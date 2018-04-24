@@ -65,9 +65,6 @@ class Seal(models.Model):
     languages = models.ManyToManyField(Language, blank=True)
     texts = models.ManyToManyField(Text, blank=True)
 
-    # impressions
-    # impressions
-
     # design
     FIG = 'FIGURATIVE'
     GEO = 'GEOMETRIC'
