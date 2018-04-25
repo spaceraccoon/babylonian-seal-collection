@@ -3,7 +3,6 @@ import { Button, Popconfirm, Spin } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
 
 import CharDetail from '../../common/CharDetail/CharDetail';
-import TagDetail from '../../common/TagDetail/TagDetail';
 import TagsDetail from '../../common/TagsDetail/TagsDetail';
 import NestedItemsDetail from '../../common/NestedItemsDetail/NestedItemsDetail';
 import {
@@ -137,7 +136,10 @@ class SealList extends Component {
                 : null
             }
           />
-          <TagDetail label="Object Type" value={this.state.seal.object_type} />
+          <TagsDetail
+            label="Object Types"
+            value={this.state.seal.object_types}
+          />
           <CharDetail
             label="Physical Remarks"
             value={this.state.seal.physical_remarks}

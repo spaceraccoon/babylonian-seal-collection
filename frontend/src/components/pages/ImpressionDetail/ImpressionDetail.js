@@ -3,7 +3,6 @@ import { Button, Popconfirm, Spin } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
 
 import CharDetail from '../../common/CharDetail/CharDetail';
-import TagDetail from '../../common/TagDetail/TagDetail';
 import TagsDetail from '../../common/TagsDetail/TagsDetail';
 import NestedItemsDetail from '../../common/NestedItemsDetail/NestedItemsDetail';
 import {
@@ -135,9 +134,9 @@ class ImpressionList extends Component {
             label="Condition"
             value={this.state.impression.condition}
           />
-          <TagDetail
-            label="Object Type"
-            value={this.state.impression.object_type}
+          <TagsDetail
+            label="Object Types"
+            values={this.state.impression.object_types}
           />
           <CharDetail
             label="Physical Remarks"
