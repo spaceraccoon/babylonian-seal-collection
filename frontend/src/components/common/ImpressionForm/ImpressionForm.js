@@ -215,12 +215,6 @@ class ImpressionForm extends Component {
           </FormItem>
           <TagsField
             form={this.props.form}
-            label="Object Type"
-            field="materials"
-            options={this.state.materials}
-          />
-          <TagsField
-            form={this.props.form}
             label="Object Types"
             field="object_types"
             options={this.state.objectTypes}
