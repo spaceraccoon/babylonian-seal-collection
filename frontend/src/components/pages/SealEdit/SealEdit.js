@@ -31,6 +31,7 @@ class SealEdit extends Component {
 
     return (
       <div className="content-body">
+        <h1>Edit Seal</h1>
         <SealForm {...this.props} seal={this.state.seal} edit />
       </div>
     );

@@ -8,6 +8,7 @@ import FloatField from '../FloatField/FloatField';
 import TagField from '../TagField/TagField';
 import TagsField from '../TagsField/TagsField';
 import NestedItemsField from '../NestedItemsField/NestedItemsField';
+import MultiSelectField from '../MultiSelectField/MultiSelectField';
 import {
   formItemLayout,
   formItemLayoutWithoutLabel,
@@ -27,16 +28,16 @@ const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 
-const mapNamesToObject = names =>
-  names.map(name => {
+const mapPropertyToObject = (propertyArray, property) =>
+  propertyArray.map(propertyItem => {
     return {
-      name,
+      [property]: propertyItem,
     };
   });
 
-const mapNameToFormField = field =>
+const mapPropertyToFormField = (field, property) =>
   Form.createFormField({
-    value: field.map(item => item.name),
+    value: field.map(item => _.get(item, property)),
   });
 
 const remapNestedItems = (field, nestedItemKey) =>
@@ -78,14 +79,14 @@ class ImpressionForm extends Component {
       if (!err) {
         values = {
           ...values,
-          materials: mapNamesToObject(values.materials),
-          periods: mapNamesToObject(values.periods),
-          languages: mapNamesToObject(values.languages),
+          materials: mapPropertyToObject(values.materials, 'name'),
+          periods: mapPropertyToObject(values.periods, 'name'),
+          languages: mapPropertyToObject(values.languages, 'name'),
           texts: values.texts
             ? values.texts.map(text => {
                 return {
                   ...text,
-                  languages: mapNamesToObject(text.languages),
+                  languages: mapPropertyToObject(text.languages, 'name'),
                 };
               })
             : [],
@@ -95,8 +96,8 @@ class ImpressionForm extends Component {
             values.object_type && values.object_type.length > 0
               ? { name: values.object_type }
               : null,
+          seals: mapPropertyToObject(values.seals, 'id'),
         };
-        console.log(values);
         if (this.props.edit) {
           this.setState({
             impression: await updateResource(
@@ -174,17 +175,12 @@ class ImpressionForm extends Component {
             label="Collection"
             field="collection"
           />
-          <FormItem {...formItemLayout} label="Created from Seal">
-            {getFieldDecorator('seal')(
-              <Select>
-                {this.state.seals.map(seal => (
-                  <Option key={seal.id} value={seal.id}>
-                    {seal.name}
-                  </Option>
-                ))}
-              </Select>
-            )}
-          </FormItem>
+          <MultiSelectField
+            form={this.props.form}
+            label="Created from Seals"
+            field="seals"
+            options={this.state.seals}
+          />
           <h2>Physical</h2>
           <FloatField
             form={this.props.form}
@@ -333,7 +329,10 @@ const WrappedImpressionForm = Form.create({
     if (props.impression) {
       let newFields = _.mapValues(props.impression, (field, key) => {
         if (['materials', 'periods', 'languages'].includes(key)) {
-          return mapNameToFormField(field);
+          return mapPropertyToFormField(field, 'name');
+        }
+        if (key === 'seals') {
+          return mapPropertyToFormField(field, 'id');
         }
         if (key === 'object_type') {
           return Form.createFormField({

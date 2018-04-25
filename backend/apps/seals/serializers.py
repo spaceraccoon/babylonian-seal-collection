@@ -25,7 +25,6 @@ from ..languages.serializers import LanguageSerializer
 from ..images.serializers import ImageSerializer
 from ..historical_relationships.serializers import HistoricalRelationshipSerializer
 from ..object_types.serializers import ObjectTypeSerializer
-from ..impressions.serializers import ListImpressionSerializer
 
 
 def get_or_create_or_update(obj_id, defaults, model, user):
@@ -45,9 +44,35 @@ def map_objects_by_name(name, model, validated_data):
     return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
+class RelatedImpressionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    name = serializers.ReadOnlyField()
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+        )
+        model = Impression
+
+
+class RelatedSealSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    name = serializers.ReadOnlyField()
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+        )
+        model = Seal
+
+
 class ListSealSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
+    name = serializers.ReadOnlyField()
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -82,7 +107,8 @@ class SealSerializer(serializers.ModelSerializer):
     publications = PublicationSerializer(many=True)
     languages = LanguageSerializer(many=True)
     object_type = ObjectTypeSerializer(allow_null=True)
-    impressions = ListImpressionSerializer(many=True)
+    impressions = RelatedImpressionSerializer(many=True)
+    related_seals = RelatedSealSerializer(many=True)
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -93,6 +119,14 @@ class SealSerializer(serializers.ModelSerializer):
 
     def get_design_text(self, obj):
         return obj.get_design_display()
+
+    def validate_related_seals(self, value):
+        if self.instance is not None:
+            for related_seal in value:
+                if self.instance.id == related_seal['id']:
+                    raise serializers.ValidationError(
+                        "Cannot assign self as a related seal.")
+        return value
 
     class Meta:
         fields = (
@@ -136,7 +170,8 @@ class SealSerializer(serializers.ModelSerializer):
             'images',
             'publications',
             'object_type',
-            'impressions'
+            'impressions',
+            'related_seals'
         )
         model = Seal
 
@@ -200,6 +235,12 @@ class SealSerializer(serializers.ModelSerializer):
                 creator=user, remarks=historical_relationship_data['remarks'], historical_person=historical_person)
             historical_relationships.append(historical_relationship)
 
+        impressions = list(map(lambda x: Impression.objects.get(
+            id=x['id']), validated_data.pop('impressions')))
+
+        related_seals = list(map(lambda x: Seal.objects.get(
+            id=x['id']), validated_data.pop('related_seals')))
+
         seal = Seal.objects.create(**validated_data)
         seal.materials.set(materials)
         seal.iconographic_elements.set(iconographic_elements)
@@ -213,28 +254,28 @@ class SealSerializer(serializers.ModelSerializer):
         seal.historical_relationships.set(historical_relationships)
         if object_type_data != None:
             seal.object_type = object_type
+        seal.impressions.set(impressions)
+        seal.related_seals.set(related_seals)
         seal.save()
         return seal
 
     def update(self, instance, validated_data):
-        materials = map_objects_by_name(
-            'materials', Material, validated_data)
-        iconographic_elements = map_objects_by_name(
-            'iconographic_elements', IconographicElement, validated_data)
-        scenes = map_objects_by_name(
-            'scenes', Scene, validated_data)
-        art_styles = map_objects_by_name(
-            'art_styles', ArtStyle, validated_data)
-        periods = map_objects_by_name(
-            'periods', Period, validated_data)
-        languages = map_objects_by_name(
-            'languages', Language, validated_data)
-        instance.materials.set(materials)
-        instance.iconographic_elements.set(iconographic_elements)
-        instance.scenes.set(scenes)
-        instance.art_styles.set(art_styles)
-        instance.periods.set(periods)
-        instance.languages.set(languages)
+        instance.materials.set(map_objects_by_name(
+            'materials', Material, validated_data))
+        instance.iconographic_elements.set(map_objects_by_name(
+            'iconographic_elements', IconographicElement, validated_data))
+        instance.scenes.set(map_objects_by_name(
+            'scenes', Scene, validated_data))
+        instance.art_styles.set(map_objects_by_name(
+            'art_styles', ArtStyle, validated_data))
+        instance.periods.set(map_objects_by_name(
+            'periods', Period, validated_data))
+        instance.languages.set(map_objects_by_name(
+            'languages', Language, validated_data))
+        instance.impressions.set(list(map(lambda x: Impression.objects.get(
+            id=x['id']), validated_data.pop('impressions'))))
+        instance.related_seals.set(list(map(lambda x: Seal.objects.get(
+            id=x['id']), validated_data.pop('related_seals'))))
 
         object_type_data = validated_data.pop('object_type')
         if object_type_data:
@@ -312,9 +353,6 @@ class SealSerializer(serializers.ModelSerializer):
                 user)
             historical_relationships.append(historical_relationship)
         instance.historical_relationships.set(historical_relationships)
-
-        instance.impressions.set(list(map(lambda x: Impression.objects.get(
-            id=x['id']), validated_data.pop('impressions'))))
 
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(

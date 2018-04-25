@@ -34,6 +34,7 @@ class ImpressionEdit extends Component {
 
     return (
       <div className="content-body">
+        <h1>Edit Impression</h1>
         <ImpressionForm
           {...this.props}
           impression={this.state.impression}

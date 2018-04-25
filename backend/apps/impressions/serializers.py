@@ -36,11 +36,23 @@ def map_objects_by_name(name, model, validated_data):
     return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
+class RelatedSealSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    name = serializers.ReadOnlyField()
+
+    class Meta:
+        fields = (
+            'id',
+            'name',
+        )
+        model = Seal
+
+
 class ListImpressionSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
-    seal_name = serializers.ReadOnlyField(source='seal.name')
+    name = serializers.ReadOnlyField()
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -51,7 +63,6 @@ class ListImpressionSerializer(serializers.ModelSerializer):
             'id',
             'can_edit',
             'creator_username',
-            'seal_name',
             'updated_at',
             'name',
         )
@@ -61,7 +72,6 @@ class ListImpressionSerializer(serializers.ModelSerializer):
 class ImpressionSerializer(serializers.ModelSerializer):
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
-    seal_name = serializers.ReadOnlyField(source='seal.name')
     surface_preservation_text = serializers.SerializerMethodField()
     texts = TextSerializer(many=True)
     historical_relationships = HistoricalRelationshipSerializer(
@@ -71,6 +81,7 @@ class ImpressionSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
     languages = LanguageSerializer(many=True)
     object_type = ObjectTypeSerializer(allow_null=True)
+    seals = RelatedSealSerializer(many=True)
 
     def get_can_edit(self, obj):
         user = self.context['request'].user
@@ -92,8 +103,7 @@ class ImpressionSerializer(serializers.ModelSerializer):
             'accession_number',
             'publication_number',
             'collection',
-            'seal_name',
-            'seal',
+            'seals',
             'length',
             'thickness',
             'width',
@@ -164,17 +174,21 @@ class ImpressionSerializer(serializers.ModelSerializer):
                 creator=user, remarks=historical_relationship_data['remarks'], historical_person=historical_person)
             historical_relationships.append(historical_relationship)
 
-        seal = Impression.objects.create(**validated_data)
-        seal.materials.set(materials)
-        seal.periods.set(periods)
-        seal.languages.set(languages)
-        seal.texts.set(texts)
-        seal.images.set(images)
-        seal.historical_relationships.set(historical_relationships)
+        seals = list(map(lambda x: Seal.objects.get(
+            id=x['id']), validated_data.pop('seals')))
+
+        impression = Impression.objects.create(**validated_data)
+        impression.materials.set(materials)
+        impression.periods.set(periods)
+        impression.languages.set(languages)
+        impression.texts.set(texts)
+        impression.images.set(images)
+        impression.historical_relationships.set(historical_relationships)
         if object_type_data != None:
-            seal.object_type = object_type
-        seal.save()
-        return seal
+            impression.object_type = object_type
+        impression.seals.set(seals)
+        impression.save()
+        return impression
 
     def update(self, instance, validated_data):
         materials = map_objects_by_name(
@@ -255,6 +269,9 @@ class ImpressionSerializer(serializers.ModelSerializer):
             historical_relationships.append(historical_relationship)
         instance.historical_relationships.set(historical_relationships)
 
+        instance.seals.set(list(map(lambda x: Seal.objects.get(
+            id=x['id']), validated_data.get('seals'))))
+
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(
             'cdli_number', instance.cdli_number)
@@ -266,8 +283,6 @@ class ImpressionSerializer(serializers.ModelSerializer):
             'publication_number', instance.publication_number)
         instance.collection = validated_data.get(
             'collection', instance.collection)
-        instance.seal = validated_data.get(
-            'seal', instance.seal)
         instance.length = validated_data.get('length', instance.length)
         instance.thickness = validated_data.get(
             'thickness', instance.thickness)

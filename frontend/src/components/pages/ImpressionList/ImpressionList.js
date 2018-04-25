@@ -37,13 +37,6 @@ class ImpressionList extends Component {
         render: timestamp => <Moment date={timestamp} />,
       },
       {
-        title: 'Seal',
-        dataIndex: 'seal',
-        render: (sealId, impression) => (
-          <Link to={`/seal/${sealId}`}>{impression.seal_name}</Link>
-        ),
-      },
-      {
         title: 'Action',
         dataIndex: 'id',
         render: (id, impression) => {
@@ -95,6 +88,7 @@ class ImpressionList extends Component {
 
     return (
       <div className="content-body">
+        <h1>Impressions</h1>
         <Table
           className="impression-table"
           columns={columns}

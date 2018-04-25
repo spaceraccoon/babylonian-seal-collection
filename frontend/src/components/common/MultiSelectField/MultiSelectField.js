@@ -18,7 +18,13 @@ class MultiSelectField extends Component {
         })(
           <Select showSearch mode="multiple" style={{ width: '100%' }}>
             {this.props.options.map(option => (
-              <Option key={option.id} value={option.id}>
+              <Option
+                key={option.id}
+                value={option.id}
+                disabled={
+                  this.props.excludeSelf && option.id === this.props.excludeSelf
+                }
+              >
                 {option.name}
               </Option>
             ))}

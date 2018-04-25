@@ -85,6 +85,7 @@ class SealList extends Component {
 
     return (
       <div className="content-body">
+        <h1>Seals</h1>
         <Table
           className="seal-table"
           columns={columns}

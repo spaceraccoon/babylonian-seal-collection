@@ -9,6 +9,7 @@ from ..publications.models import Publication
 from ..texts.models import Text
 from ..languages.models import Language
 from ..object_types.models import ObjectType
+from ..impressions.models import Impression
 
 
 class Seal(models.Model):
@@ -25,6 +26,12 @@ class Seal(models.Model):
     accession_number = models.CharField(blank=True, max_length=255)
     publication_number = models.CharField(blank=True, max_length=255)
     collection = models.CharField(blank=True, max_length=255)
+
+    # relationships
+    impressions = models.ManyToManyField(
+        Impression, related_name='seals', blank=True)
+    related_seals = models.ManyToManyField(
+        'self', related_name='related_seals', blank=True)
 
     # physical
     height = models.FloatField(blank=True, null=True)

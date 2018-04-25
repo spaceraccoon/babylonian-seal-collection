@@ -1,6 +1,5 @@
 from django.db import models
 
-from ..seals.models import Seal
 from ..materials.models import Material
 from ..periods.models import Period
 from ..texts.models import Text
@@ -23,8 +22,6 @@ class Impression(models.Model):
     accession_number = models.CharField(blank=True, max_length=255)
     publication_number = models.CharField(blank=True, max_length=255)
     collection = models.CharField(blank=True, max_length=255)
-    seal = models.ForeignKey(
-        Seal, related_name='impressions', on_delete=models.SET_NULL, blank=True, null=True)
 
     # physical
     length = models.FloatField(blank=True, null=True)

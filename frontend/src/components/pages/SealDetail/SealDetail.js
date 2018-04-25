@@ -102,6 +102,11 @@ class SealList extends Component {
             label="Impressions"
             values={this.state.seal.impressions}
           />
+          <TagsDetail
+            link="seal"
+            label="Related Seals (Iterations)"
+            values={this.state.seal.related_seals}
+          />
           <h2>Physical</h2>
           <CharDetail label="Height (mm)" value={this.state.seal.height} />
           <CharDetail

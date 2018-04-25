@@ -77,6 +77,7 @@ class SealForm extends Component {
     historicalPersons: [],
     objectTypes: [],
     impressions: [],
+    seals: [],
   };
 
   handleSubmit = e => {
@@ -110,8 +111,8 @@ class SealForm extends Component {
               ? { name: values.object_type }
               : null,
           impressions: mapPropertyToObject(values.impressions, 'id'),
+          related_seals: mapPropertyToObject(values.related_seals, 'id'),
         };
-        console.log(values);
         if (this.props.edit) {
           this.setState({
             seal: await updateResource(this.props.seal.id, values, 'seal'),
@@ -140,6 +141,7 @@ class SealForm extends Component {
       historicalPersons: await mapHistoricalPersonOptions(),
       objectTypes: await fetchResources('objecttype'),
       impressions: await fetchResources('impression'),
+      seals: await fetchResources('seal'),
       isLoading: false,
     });
   }
@@ -194,6 +196,13 @@ class SealForm extends Component {
             label="Impressions"
             field="impressions"
             options={this.state.impressions}
+          />
+          <MultiSelectField
+            form={this.props.form}
+            label="Related Seals (Iterations)"
+            field="related_seals"
+            options={this.state.seals}
+            excludeSelf={this.props.seal && this.props.seal.id}
           />
           <h2>Physical</h2>
           <FloatField
@@ -410,7 +419,7 @@ const WrappedSealForm = Form.create({
         ) {
           return mapPropertyToFormField(field, 'name');
         }
-        if (key === 'impressions') {
+        if (['impressions', 'related_seals'].includes(key)) {
           return mapPropertyToFormField(field, 'id');
         }
         if (key === 'object_type') {
