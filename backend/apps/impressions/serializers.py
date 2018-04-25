@@ -80,7 +80,7 @@ class ImpressionSerializer(serializers.ModelSerializer):
     periods = PeriodSerializer(many=True)
     images = ImageSerializer(many=True)
     languages = LanguageSerializer(many=True)
-    object_type = ObjectTypeSerializer(allow_null=True)
+    object_types = ObjectTypeSerializer(many=True)
     seals = RelatedSealSerializer(many=True)
 
     def get_can_edit(self, obj):
@@ -121,7 +121,7 @@ class ImpressionSerializer(serializers.ModelSerializer):
             'historical_relationships',
             'texts',
             'images',
-            'object_type'
+            'object_types'
         )
         model = Impression
 
@@ -132,11 +132,8 @@ class ImpressionSerializer(serializers.ModelSerializer):
             'periods', Period, validated_data)
         languages = map_objects_by_name(
             'languages', Language, validated_data)
-
-        object_type_data = validated_data.pop('object_type')
-        if object_type_data != None:
-            object_type = ObjectType.objects.get_or_create(
-                name=object_type_data['name'])[0]
+        object_types = map_objects_by_name(
+            'object_types', ObjectType, validated_data)
 
         user = self.context['request'].user
 
@@ -184,28 +181,20 @@ class ImpressionSerializer(serializers.ModelSerializer):
         impression.texts.set(texts)
         impression.images.set(images)
         impression.historical_relationships.set(historical_relationships)
-        if object_type_data != None:
-            impression.object_type = object_type
+        impression.object_types.set(object_types)
         impression.seals.set(seals)
         impression.save()
         return impression
 
     def update(self, instance, validated_data):
-        materials = map_objects_by_name(
-            'materials', Material, validated_data)
-        periods = map_objects_by_name(
-            'periods', Period, validated_data)
-        languages = map_objects_by_name(
-            'languages', Language, validated_data)
-        instance.materials.set(materials)
-        instance.periods.set(periods)
-        instance.languages.set(languages)
-
-        object_type_data = validated_data.pop('object_type')
-        if object_type_data:
-            object_type = ObjectType.objects.get_or_create(
-                name=object_type_data['name'])[0]
-            instance.object_type = object_type
+        instance.materials.set(map_objects_by_name(
+            'materials', Material, validated_data))
+        instance.periods.set(map_objects_by_name(
+            'periods', Period, validated_data))
+        instance.languages.set(map_objects_by_name(
+            'languages', Language, validated_data))
+        instance.object_types.set(map_objects_by_name(
+            'object_types', ObjectType, validated_data))
 
         user = self.context['request'].user
 

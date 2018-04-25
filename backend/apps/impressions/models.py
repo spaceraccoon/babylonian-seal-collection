@@ -46,8 +46,7 @@ class Impression(models.Model):
     )
     condition = models.TextField(blank=True)
     physical_remarks = models.TextField(blank=True)
-    object_type = models.ForeignKey(
-        ObjectType, on_delete=models.SET_NULL, blank=True, null=True)
+    object_types = models.ManyToManyField(ObjectType, blank=True)
 
     # provenance
     periods = models.ManyToManyField(Period, blank=True)
