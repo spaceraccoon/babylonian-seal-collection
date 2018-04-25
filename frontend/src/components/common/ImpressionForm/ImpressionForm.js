@@ -5,7 +5,6 @@ import { Redirect, Link } from 'react-router-dom';
 import './ImpressionForm.css';
 import CharField from '../CharField/CharField';
 import FloatField from '../FloatField/FloatField';
-import TagField from '../TagField/TagField';
 import TagsField from '../TagsField/TagsField';
 import NestedItemsField from '../NestedItemsField/NestedItemsField';
 import MultiSelectField from '../MultiSelectField/MultiSelectField';
@@ -92,10 +91,7 @@ class ImpressionForm extends Component {
             : [],
           images: values.images || [],
           historical_relationships: values.historical_relationships || [],
-          object_type:
-            values.object_type && values.object_type.length > 0
-              ? { name: values.object_type }
-              : null,
+          object_types: mapPropertyToObject(values.object_types, 'name'),
           seals: mapPropertyToObject(values.seals, 'id'),
         };
         if (this.props.edit) {
@@ -217,10 +213,16 @@ class ImpressionForm extends Component {
           <FormItem {...formItemLayout} label="Condition">
             {getFieldDecorator('condition')(<TextArea rows={4} />)}
           </FormItem>
-          <TagField
+          <TagsField
             form={this.props.form}
             label="Object Type"
-            field="object_type"
+            field="materials"
+            options={this.state.materials}
+          />
+          <TagsField
+            form={this.props.form}
+            label="Object Types"
+            field="object_types"
             options={this.state.objectTypes}
           />
           <FormItem {...formItemLayout} label="Physical Remarks">
@@ -328,16 +330,13 @@ const WrappedImpressionForm = Form.create({
   mapPropsToFields(props) {
     if (props.impression) {
       let newFields = _.mapValues(props.impression, (field, key) => {
-        if (['materials', 'periods', 'languages'].includes(key)) {
+        if (
+          ['materials', 'periods', 'languages', 'object_types'].includes(key)
+        ) {
           return mapPropertyToFormField(field, 'name');
         }
         if (key === 'seals') {
           return mapPropertyToFormField(field, 'id');
-        }
-        if (key === 'object_type') {
-          return Form.createFormField({
-            value: field ? field.name : '',
-          });
         }
         if (key === 'texts') {
           return Form.createFormField({

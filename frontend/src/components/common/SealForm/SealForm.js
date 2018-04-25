@@ -5,7 +5,6 @@ import { Redirect, Link } from 'react-router-dom';
 import './SealForm.css';
 import CharField from '../CharField/CharField';
 import FloatField from '../FloatField/FloatField';
-import TagField from '../TagField/TagField';
 import TagsField from '../TagsField/TagsField';
 import MultiSelectField from '../MultiSelectField/MultiSelectField';
 import NestedItemsField from '../NestedItemsField/NestedItemsField';
