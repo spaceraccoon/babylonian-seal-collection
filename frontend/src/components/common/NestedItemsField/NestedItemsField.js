@@ -56,7 +56,7 @@ class NestedItemsField extends Component {
           headerText={
             _.get(this.state.items[index], this.props.nestedItemLabel) ||
             this.state.items[index][this.props.nestedItemLabel] ||
-            `New ${this.props.singularLabel}`
+            `New ${pluralize.singular(this.props.label)}`
           }
           item={item}
           itemFields={this.props.itemFields}

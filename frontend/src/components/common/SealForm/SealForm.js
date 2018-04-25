@@ -106,10 +106,7 @@ class SealForm extends Component {
             : [],
           images: values.images || [],
           historical_relationships: values.historical_relationships || [],
-          object_type:
-            values.object_type && values.object_type.length > 0
-              ? { name: values.object_type }
-              : null,
+          object_types: mapPropertyToObject(values.object_types, 'name'),
           impressions: mapPropertyToObject(values.impressions, 'id'),
           related_seals: mapPropertyToObject(values.related_seals, 'id'),
         };
@@ -258,10 +255,10 @@ class SealForm extends Component {
               </RadioGroup>
             )}
           </FormItem>
-          <TagField
+          <TagsField
             form={this.props.form}
-            label="Object Type"
-            field="object_type"
+            label="Object Types"
+            field="object_types"
             options={this.state.objectTypes}
           />
           <FormItem {...formItemLayout} label="Physical Remarks">
@@ -415,17 +412,13 @@ const WrappedSealForm = Form.create({
             'art_styles',
             'periods',
             'languages',
+            'object_types',
           ].includes(key)
         ) {
           return mapPropertyToFormField(field, 'name');
         }
         if (['impressions', 'related_seals'].includes(key)) {
           return mapPropertyToFormField(field, 'id');
-        }
-        if (key === 'object_type') {
-          return Form.createFormField({
-            value: field ? field.name : '',
-          });
         }
         if (key === 'texts') {
           return Form.createFormField({

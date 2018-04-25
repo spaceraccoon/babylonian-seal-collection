@@ -106,7 +106,7 @@ class SealSerializer(serializers.ModelSerializer):
     images = ImageSerializer(many=True)
     publications = PublicationSerializer(many=True)
     languages = LanguageSerializer(many=True)
-    object_type = ObjectTypeSerializer(allow_null=True)
+    object_types = ObjectTypeSerializer(many=True)
     impressions = RelatedImpressionSerializer(many=True)
     related_seals = RelatedSealSerializer(many=True)
 
@@ -169,7 +169,7 @@ class SealSerializer(serializers.ModelSerializer):
             'iconographic_elements',
             'images',
             'publications',
-            'object_type',
+            'object_types',
             'impressions',
             'related_seals'
         )
@@ -188,11 +188,8 @@ class SealSerializer(serializers.ModelSerializer):
             'periods', Period, validated_data)
         languages = map_objects_by_name(
             'languages', Language, validated_data)
-
-        object_type_data = validated_data.pop('object_type')
-        if object_type_data != None:
-            object_type = ObjectType.objects.get_or_create(
-                name=object_type_data['name'])[0]
+        object_types = map_objects_by_name(
+            'object_types', ObjectType, validated_data)
 
         user = self.context['request'].user
 
@@ -252,8 +249,7 @@ class SealSerializer(serializers.ModelSerializer):
         seal.texts.set(texts)
         seal.images.set(images)
         seal.historical_relationships.set(historical_relationships)
-        if object_type_data != None:
-            seal.object_type = object_type
+        seal.object_types.set(object_types)
         seal.impressions.set(impressions)
         seal.related_seals.set(related_seals)
         seal.save()
@@ -272,16 +268,12 @@ class SealSerializer(serializers.ModelSerializer):
             'periods', Period, validated_data))
         instance.languages.set(map_objects_by_name(
             'languages', Language, validated_data))
+        instance.object_types.set(map_objects_by_name(
+            'object_types', ObjectType, validated_data))
         instance.impressions.set(list(map(lambda x: Impression.objects.get(
             id=x['id']), validated_data.pop('impressions'))))
         instance.related_seals.set(list(map(lambda x: Seal.objects.get(
             id=x['id']), validated_data.pop('related_seals'))))
-
-        object_type_data = validated_data.pop('object_type')
-        if object_type_data:
-            object_type = ObjectType.objects.get_or_create(
-                name=object_type_data['name'])[0]
-            instance.object_type = object_type
 
         user = self.context['request'].user
 

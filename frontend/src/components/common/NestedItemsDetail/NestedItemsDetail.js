@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Collapse } from 'antd';
 import _ from 'lodash';
+import pluralize from 'pluralize';
 
 import DetailRow from '../DetailRow/DetailRow';
 import CharDetail from '../CharDetail/CharDetail';
@@ -19,7 +20,7 @@ class NestedItemsDetail extends Component {
                 <Panel
                   header={
                     _.get(value, this.props.nestedItemLabel) ||
-                    `${this.props.label} ${value.id}`
+                    `Untitled ${pluralize.singular(this.props.label)}`
                   }
                 >
                   {this.props.itemDetails.map(itemDetail => {
