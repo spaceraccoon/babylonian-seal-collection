@@ -2,18 +2,25 @@ import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { Icon, Layout, Menu, Popover } from 'antd';
 
-import './Navigation.css';
 import { signOut } from '../../../api/sessionApi';
 import enquireScreen from '../../../utils/enquireScreen';
+import './Navigation.css';
 
 const { Header } = Layout;
 
+/**
+ * Navigation menu component that displays navigation links.
+ */
 class Navigation extends Component {
   state = {
     menuMode: 'horizontal',
     menuVisible: false,
   };
 
+  /**
+   * Ensures popover menu (if in use) is hidden on load and sets menuMode
+   * based on screen size.
+   */
   componentDidMount() {
     this.props.history.listen(this.handleHideMenu);
     enquireScreen(b => {
@@ -40,14 +47,14 @@ class Navigation extends Component {
   };
 
   render() {
+    const { location } = this.props;
+
     const menu = (
       <Menu
         selectable={false}
         theme={this.state.menuMode === 'horizontal' ? 'dark' : 'light'}
         mode={this.state.menuMode}
         style={{ lineHeight: '64px' }}
-        id="nav"
-        key="nav"
       >
         <Menu.Item key="1">
           <Link to="/">Home</Link>
@@ -56,7 +63,7 @@ class Navigation extends Component {
           <Link
             to={{
               pathname: '/seal/create',
-              state: { from: this.props.location },
+              state: { from: location },
             }}
           >
             Create Seal
@@ -69,12 +76,13 @@ class Navigation extends Component {
           <Link
             to={{
               pathname: '/impression/create',
-              state: { from: this.props.location },
+              state: { from: location },
             }}
           >
             Create Impression
           </Link>
         </Menu.Item>
+        {/**Checks if user is signed in and displays appropriate button. */}
         {localStorage.accessToken ? (
           <Menu.Item key="5" style={{ float: 'right' }}>
             <a href="/" onClick={signOut}>
@@ -107,8 +115,9 @@ class Navigation extends Component {
               type="bars"
             />
           </Popover>
-        ) : null}
-        {this.state.menuMode === 'horizontal' && menu}
+        ) : (
+          menu
+        )}
       </Header>
     );
   }
