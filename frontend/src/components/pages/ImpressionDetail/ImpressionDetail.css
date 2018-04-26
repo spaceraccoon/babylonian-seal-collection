@@ -1,9 +1,5 @@
-.impression-detail {
-  margin-bottom: 4px;
-}
-
 .impression-detail__button {
-  margin: 0 4px 0 24px;
+  margin: 0 4px 8px 0;
 }
 
 .impression-detail__label {

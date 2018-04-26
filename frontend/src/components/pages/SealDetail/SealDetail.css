@@ -1,9 +1,5 @@
-.seal-detail {
-  margin-bottom: 4px;
-}
-
 .seal-detail__button {
-  margin: 0 4px 0 24px;
+  margin: 0 4px 8px 0;
 }
 
 .seal-detail__label {

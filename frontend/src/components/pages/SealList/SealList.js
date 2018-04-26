@@ -5,15 +5,20 @@ import { Link } from 'react-router-dom';
 import { Button, Popconfirm, Table } from 'antd';
 
 import { fetchResources, deleteResource } from '../../../api/resourceApi';
-
 import './SealList.css';
 
+/**
+ * Page that lists all seals.
+ */
 class SealList extends Component {
   state = {
     isLoading: true,
     seals: [],
   };
 
+  /**
+   * Fetches and sets seal list.
+   */
   async componentDidMount() {
     this.setState({
       isLoading: false,
@@ -45,6 +50,9 @@ class SealList extends Component {
               <Link to={`/seal/${id}`}>
                 <Button className="seal-table__button">View</Button>
               </Link>
+              {/**
+               * Displays action buttons for users with edit permissions.
+               */}
               {seal.can_edit && (
                 <Fragment>
                   <Link

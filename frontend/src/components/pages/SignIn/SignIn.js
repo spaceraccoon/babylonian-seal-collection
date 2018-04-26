@@ -2,16 +2,23 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import { Col, Form, Row, Tabs } from 'antd';
 
-import SignInForm from './SignInForm/SignInForm';
+import SignInForm from './components/SignInForm/SignInForm';
 import './SignIn.css';
 
 const { TabPane } = Tabs;
 
+/**
+ * Sign up page for users to sign in or sign up.
+ */
 class SignIn extends Component {
   state = {
     redirectToReferrer: false,
   };
 
+  /**
+   * Displays sign in and sign up tabs, redirecting to referrer
+   * on successful sign in or sign up.
+   */
   render() {
     const { from } = this.props.location.state || { from: { pathname: '/' } };
     if (this.state.redirectToReferrer || localStorage.getItem('accessToken')) {

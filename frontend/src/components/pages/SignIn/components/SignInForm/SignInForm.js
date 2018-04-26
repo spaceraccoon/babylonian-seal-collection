@@ -1,12 +1,19 @@
 import React, { Component, Fragment } from 'react';
 import { Button, Form, Icon, Input } from 'antd';
 
-import { createResource } from '../../../../api/resourceApi';
-import { signIn } from '../../../../api/sessionApi';
+import { createResource } from '../../../../../api/resourceApi';
+import { signIn } from '../../../../../api/sessionApi';
 
 const FormItem = Form.Item;
 
+/**
+ * Sign in form component that either signs in or
+ * signs up the user based on the register prop.
+ */
 class SignInForm extends Component {
+  /**
+   * Submits form data to corresponding API endpoints.
+   */
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
@@ -63,6 +70,9 @@ class SignInForm extends Component {
             />
           )}
         </FormItem>
+        {/**
+         * Only display email field for registration.
+         */}
         {this.props.register && (
           <FormItem>
             {getFieldDecorator('email', {

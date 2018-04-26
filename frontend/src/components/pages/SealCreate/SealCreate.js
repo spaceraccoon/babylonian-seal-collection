@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import SealForm from '../../common/SealForm/SealForm';
 
+/**
+ * Page that displays a seal creation form.
+ */
 class SealCreate extends Component {
   render() {
     return (

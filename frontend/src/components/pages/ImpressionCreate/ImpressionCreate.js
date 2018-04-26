@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import ImpressionForm from '../../common/ImpressionForm/ImpressionForm';
 
+/**
+ * Page that displays an impression creation form.
+ */
 class ImpressionCreate extends Component {
   render() {
     return (

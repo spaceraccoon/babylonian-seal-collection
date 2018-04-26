@@ -5,15 +5,20 @@ import { Link } from 'react-router-dom';
 import { Button, Popconfirm, Table } from 'antd';
 
 import { fetchResources, deleteResource } from '../../../api/resourceApi';
-
 import './ImpressionList.css';
 
+/**
+ * Page that lists all impressions.
+ */
 class ImpressionList extends Component {
   state = {
     isLoading: true,
     impressions: [],
   };
 
+  /**
+   * Fetches and sets impression list.
+   */
   async componentDidMount() {
     this.setState({
       isLoading: false,
@@ -45,6 +50,9 @@ class ImpressionList extends Component {
               <Link to={`/impression/${id}`}>
                 <Button className="impression-table__button">View</Button>
               </Link>
+              {/**
+               * Displays action buttons for users with edit permissions.
+               */}
               {impression.can_edit && (
                 <Fragment>
                   <Link

@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Button, Popconfirm, Spin } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
 
+import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import CharDetail from '../../common/CharDetail/CharDetail';
 import TagsDetail from '../../common/TagsDetail/TagsDetail';
 import NestedItemsDetail from '../../common/NestedItemsDetail/NestedItemsDetail';
@@ -11,17 +12,36 @@ import {
   imageFields,
   historicalRelationshipFields,
 } from '../../../data/itemFields';
-import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import './SealDetail.css';
 
-class SealList extends Component {
+/**
+ * Page that displays an individual seal's details.
+ */
+class SealDetail extends Component {
   state = {
     isLoading: true,
     redirect: false,
     seal: {},
   };
 
+  /**
+   * Fetches and sets seal details.
+   */
   async componentDidMount() {
+    this.setState({
+      seal: await fetchResource(this.props.match.params.id, 'seal'),
+      isLoading: false,
+    });
+  }
+
+  /**
+   * Refreshes props and state when clicking on related seal link.
+   */
+  async componentWillReceiveProps(nextProps) {
+    this.setState({
+      isLoading: true,
+    });
+    this.props = nextProps;
     this.setState({
       seal: await fetchResource(this.props.match.params.id, 'seal'),
       isLoading: false,
@@ -35,7 +55,7 @@ class SealList extends Component {
     return (
       <Spin spinning={this.state.isLoading}>
         <div className="content-body">
-          <h1 style={{ display: 'inline-block' }}>{this.state.seal.name}</h1>
+          <h1>{this.state.seal.name}</h1>
           {this.state.seal.can_edit && (
             <Fragment>
               <Link
@@ -51,6 +71,9 @@ class SealList extends Component {
               <Popconfirm
                 title="Are you sure？"
                 onConfirm={async () => {
+                  /**
+                   * Redirect to seal list page after deletion.
+                   */
                   if (await deleteResource(this.state.seal.id, 'seal')) {
                     this.setState({
                       redirect: true,
@@ -201,4 +224,4 @@ class SealList extends Component {
   }
 }
 
-export default SealList;
+export default SealDetail;

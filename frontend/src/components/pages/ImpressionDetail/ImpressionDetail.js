@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Button, Popconfirm, Spin } from 'antd';
 import { Link, Redirect } from 'react-router-dom';
 
+import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import CharDetail from '../../common/CharDetail/CharDetail';
 import TagsDetail from '../../common/TagsDetail/TagsDetail';
 import NestedItemsDetail from '../../common/NestedItemsDetail/NestedItemsDetail';
@@ -10,16 +11,21 @@ import {
   imageFields,
   historicalRelationshipFields,
 } from '../../../data/itemFields';
-import { fetchResource, deleteResource } from '../../../api/resourceApi';
 import './ImpressionDetail.css';
 
-class ImpressionList extends Component {
+/**
+ * Page that displays an individual impression's details.
+ */
+class ImpressionDetail extends Component {
   state = {
     isLoading: true,
     redirect: false,
     impression: {},
   };
 
+  /**
+   * Fetches and sets impression details.
+   */
   async componentDidMount() {
     this.setState({
       impression: await fetchResource(this.props.match.params.id, 'impression'),
@@ -34,9 +40,7 @@ class ImpressionList extends Component {
     return (
       <Spin spinning={this.state.isLoading}>
         <div className="content-body">
-          <h1 style={{ display: 'inline-block' }}>
-            {this.state.impression.name}
-          </h1>
+          <h1>{this.state.impression.name}</h1>
           {this.state.impression.can_edit && (
             <Fragment>
               <Link
@@ -52,6 +56,9 @@ class ImpressionList extends Component {
               <Popconfirm
                 title="Are you sure？"
                 onConfirm={async () => {
+                  /**
+                   * Redirect to seal list page after deletion.
+                   */
                   if (
                     await deleteResource(this.state.impression.id, 'impression')
                   ) {
@@ -186,4 +193,4 @@ class ImpressionList extends Component {
   }
 }
 
-export default ImpressionList;
+export default ImpressionDetail;
