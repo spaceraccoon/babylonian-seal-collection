@@ -27,3 +27,16 @@ A digital library for recording and displaying seals from the Yale Babylonian Co
 Heroku deploy button:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+
+For manual deploy:
+
+1.  `heroku create`
+2.  Run `heroku config:set ENV_VARIABLE=value` for the following variables:
+    * `SECRET_KEY` (note that special characters may fail on the Heroku CLI/Windows, so you will need to set this via the the Heroku console)
+    * `AWS_ACCESS_KEY`
+    * `AWS_SECRET_ACCESS_KEY`
+    * `AWS_STORAGE_BUCKET_NAME`
+    * `DJANGO_SETTINGS_MODULE` (set to `backend.settings.production`)
+3.  `heroku buildpacks:set heroku/python` then `heroku buildpacks:add --index 1 heroku/nodejs`
+4.  `git push heroku master`
+5.  To create a superuser, run `heroku run python manage.py createsuperuser`.
