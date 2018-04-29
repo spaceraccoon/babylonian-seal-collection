@@ -48,7 +48,7 @@ class App extends Component {
     return (
       <Layout style={{ minHeight: '100vh' }}>
         <Navigation />
-        <Content style={{ padding: '0 50px' }}>
+        <Content className="content">
           <Breadcrumbs location={this.props.location} />
           <Switch>
             <Route exact path="/" component={SealList} />

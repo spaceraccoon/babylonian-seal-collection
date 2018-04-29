@@ -340,6 +340,7 @@ class ImpressionForm extends Component {
               className="impression-form__button"
               type="primary"
               htmlType="submit"
+              disabled={this.state.isLoading}
             >
               {this.props.edit ? (
                 <Fragment>Update</Fragment>

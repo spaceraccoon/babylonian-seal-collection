@@ -8,12 +8,12 @@ class DetailRow extends Component {
   render() {
     return (
       <Row className="seal-detail">
-        <Col xs={24} lg={4} className="seal-detail__label">
+        <Col xs={24} md={4} className="seal-detail__label">
           <label>
             <strong>{this.props.label}</strong>
           </label>
         </Col>
-        <Col xs={24} lg={this.props.nested ? 20 : 12}>
+        <Col xs={24} md={this.props.nested ? 20 : 12}>
           {this.props.children}
         </Col>
       </Row>

@@ -423,6 +423,7 @@ class SealForm extends Component {
               className="seal-form__button"
               type="primary"
               htmlType="submit"
+              disabled={this.state.isLoading}
             >
               {this.props.edit ? (
                 <Fragment>Update</Fragment>

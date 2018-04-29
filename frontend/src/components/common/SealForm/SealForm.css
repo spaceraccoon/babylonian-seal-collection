@@ -2,6 +2,12 @@
   margin-right: 4px;
 }
 
+@media only screen and (max-width: 991.99px) {
+  .ant-form-item-label {
+    text-align: left;
+  }
+}
+
 .dynamic-delete-button {
   cursor: pointer;
   margin-right: 16px;

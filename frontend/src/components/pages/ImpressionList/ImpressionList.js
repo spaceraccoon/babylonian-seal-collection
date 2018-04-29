@@ -104,6 +104,7 @@ class ImpressionList extends Component {
           loading={this.state.isLoading}
           rowClassName="impression-table__row"
           rowKey="id"
+          scroll={{ x: 800 }}
         />
       </div>
     );

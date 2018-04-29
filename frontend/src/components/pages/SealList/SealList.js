@@ -101,6 +101,7 @@ class SealList extends Component {
           loading={this.state.isLoading}
           rowClassName="seal-table__row"
           rowKey="id"
+          scroll={{ x: 800 }}
         />
       </div>
     );
