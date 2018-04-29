@@ -21,6 +21,18 @@
     "AWS_STORAGE_BUCKET_NAME": {
       "description": "S3 storage bucket name.",
       "required": false
+    },
+    "DJANGO_SETTINGS_MODULE": {
+      "description": "Production setting (do not change)",
+      "value": "backend.settings.production"
     }
-  }
+  },
+  "addons": [
+    {
+      "plan": "heroku-postgresql",
+      "options": {
+        "version": "10.3"
+      }
+    }
+  ]
 }

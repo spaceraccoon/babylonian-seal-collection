@@ -24,4 +24,6 @@ A digital library for recording and displaying seals from the Yale Babylonian Co
 
 # Deploy
 
-Heroku deploy button: [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+Heroku deploy button:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
