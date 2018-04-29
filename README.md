@@ -16,7 +16,7 @@ A digital library for recording and displaying seals from the Yale Babylonian Co
 2.  `pipenv install --dev`
 3.  In `backend`, ceate `.env` from the `.env.sample` template
     * If you do not need image uploads, you only need to fill SECRET_KEY.
-    * If you wna tto include image uploads, follow the "Prerequisite Tasks" and "Configuring CORS" section in the [S3 documentation](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-photo-album.html) and save the information accordingly.
+    * If you want to include image uploads, follow the "Prerequisite Tasks" and "Configuring CORS" section in the [S3 documentation](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/s3-example-photo-album.html) and save the information accordingly.
 4.  Back in the root folder, run `pipenv shell`, `python manage.py migrate` and `python manage.py runserver`
 5.  In another terminal, `cd frontend`, `yarn`, and `yarn start`
 6.  After initial installation, you can start development by running `pipenv shell` then `python manage.py runserver` in one terminal and `cd frontend` and `yarn start` in another.
