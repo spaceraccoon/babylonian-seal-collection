@@ -20,6 +20,21 @@ from ..object_types.serializers import ObjectTypeSerializer
 
 
 def get_or_create_or_update(obj_id, defaults, model, user):
+    """Gets, creates, or updates instance.
+
+    If instance with instance_id exists, updates instance if user has correct 
+    permissions. Otherwise, simply returns instance. If instance does not
+    exist, creates a new instance.
+
+    Args:
+        instance_id (int): ID of instance.
+        defaults (:obj:): Data of object if creating or updating.
+        model (Model): Model of instance.
+        user (User): User information associated with request.
+
+    Returns:
+        Model instance.
+    """
     try:
         obj = model.objects.get(id=obj_id)
         if obj.creator == user or user.is_staff or user.is_superuser:
@@ -32,11 +47,28 @@ def get_or_create_or_update(obj_id, defaults, model, user):
 
 
 def map_objects_by_name(name, model, validated_data):
+    """Gets or creates model instances from list.
+
+    If instance with name exists, gets instance, otherwise creates new instance.
+
+    Args:
+        field_name (str): Name of field that contains list of data.
+        model (Model): Model of instance.
+        validated_data (:obj:): Validated data from request.
+
+    Returns:
+        List of Model instances.
+    """
+
     data = validated_data.pop(name)
     return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
 class RelatedSealSerializer(serializers.ModelSerializer):
+    """
+    Minimal Seal serializer that only serializes id and name.
+    """
+
     id = serializers.IntegerField()
     name = serializers.ReadOnlyField()
 
@@ -49,12 +81,20 @@ class RelatedSealSerializer(serializers.ModelSerializer):
 
 
 class ListImpressionSerializer(serializers.ModelSerializer):
+    """
+    Minimal Seal serializer that only serializes a few fields.
+    """
+
     id = serializers.IntegerField()
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
     name = serializers.ReadOnlyField()
 
     def get_can_edit(self, obj):
+        """
+        Returns boolean specifying whether user from request has edit
+        permissions for the instance.
+        """
         user = self.context['request'].user
         return obj.creator == user or user.is_staff or user.is_superuser
 
@@ -70,6 +110,10 @@ class ListImpressionSerializer(serializers.ModelSerializer):
 
 
 class ImpressionSerializer(serializers.ModelSerializer):
+    """
+    Detailed Seal serializer that handles creating and updating seals.
+    """
+
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
     surface_preservation_text = serializers.SerializerMethodField()
@@ -84,10 +128,18 @@ class ImpressionSerializer(serializers.ModelSerializer):
     seals = RelatedSealSerializer(many=True)
 
     def get_can_edit(self, obj):
+        """
+        Returns boolean specifying whether user from request has edit
+        permissions for the instance.
+        """
         user = self.context['request'].user
         return obj.creator == user or user.is_staff or user.is_superuser
 
     def get_surface_preservation_text(self, obj):
+        """
+        Returns string corresponding to the value of the enum rather than
+        the key for the options.
+        """
         return obj.get_surface_preservation_display()
 
     class Meta:
@@ -126,6 +178,13 @@ class ImpressionSerializer(serializers.ModelSerializer):
         model = Impression
 
     def create(self, validated_data):
+        """Overrides default create method.
+
+        Handles list/nested fields with deep serializers like texts.
+        """
+
+        # Uses `map_objects_by_name` for simpler nested fields with only a
+        # `name` field.
         materials = map_objects_by_name(
             'materials', Material, validated_data)
         periods = map_objects_by_name(
@@ -137,6 +196,9 @@ class ImpressionSerializer(serializers.ModelSerializer):
 
         user = self.context['request'].user
 
+        # Since `text` contains a nested ManyToMany field `languages`, it is
+        # necessary to run `map_objects_by_name` on each `text`'s `languages`
+        # field as well.
         text_data = validated_data.pop('texts')
         texts = []
         for text in text_data:
@@ -151,10 +213,15 @@ class ImpressionSerializer(serializers.ModelSerializer):
             new_text.save()
             texts.append(new_text)
 
+        # Since `images` are meant to be create-only, it maps using `create`
+        # instead of `get_or_create`.
         image_data = validated_data.pop('images')
         images = list(map(lambda x: Image.objects.create(
             **{'creator': user, 'name': x['name'], 'source': x['source'], 'description': x['description'], 's3_key': x['s3_key']}), image_data))
 
+        # Since `historical_relationship` contains a nested many-to-one field
+        # `historical_person`, it is necessary to run `get_or_create_or_update`
+        # on each `historical_relationship`'s `historical_person` field.
         historical_relationships_data = validated_data.pop(
             'historical_relationships')
         historical_relationships = []
@@ -171,9 +238,13 @@ class ImpressionSerializer(serializers.ModelSerializer):
                 creator=user, remarks=historical_relationship_data['remarks'], historical_person=historical_person)
             historical_relationships.append(historical_relationship)
 
+        # Since `seals` does not expect nested data or creating new instances,
+        # it is sufficient to use `get` over the IDs.
         seals = list(map(lambda x: Seal.objects.get(
             id=x['id']), validated_data.pop('seals')))
 
+        # Finally creates the Impression instance and sets/saves the nested
+        # fields.
         impression = Impression.objects.create(**validated_data)
         impression.materials.set(materials)
         impression.periods.set(periods)
@@ -187,6 +258,13 @@ class ImpressionSerializer(serializers.ModelSerializer):
         return impression
 
     def update(self, instance, validated_data):
+        """Overrides default update method.
+
+        Handles list/nested fields with deep serializers like texts.
+        """
+
+        # Sets the simple nested fields that do not require deep parsing
+        # or creation.
         instance.materials.set(map_objects_by_name(
             'materials', Material, validated_data))
         instance.periods.set(map_objects_by_name(
@@ -198,6 +276,8 @@ class ImpressionSerializer(serializers.ModelSerializer):
 
         user = self.context['request'].user
 
+        # For the more complex nested data, the processes are similar to in the
+        # `create` method, except it also supports updating.
         text_data = validated_data.pop('texts')
         texts = []
         for text in text_data:
@@ -261,6 +341,8 @@ class ImpressionSerializer(serializers.ModelSerializer):
         instance.seals.set(list(map(lambda x: Seal.objects.get(
             id=x['id']), validated_data.get('seals'))))
 
+        # Updates the Impression instance with the rest of the non-nested
+        # fields.
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(
             'cdli_number', instance.cdli_number)

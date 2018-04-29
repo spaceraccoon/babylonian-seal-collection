@@ -27,9 +27,25 @@ from ..historical_relationships.serializers import HistoricalRelationshipSeriali
 from ..object_types.serializers import ObjectTypeSerializer
 
 
-def get_or_create_or_update(obj_id, defaults, model, user):
+def get_or_create_or_update(instance_id, defaults, model, user):
+    """Gets, creates, or updates instance.
+
+    If instance with instance_id exists, updates instance if user has correct 
+    permissions. Otherwise, simply returns instance. If instance does not
+    exist, creates a new instance.
+
+    Args:
+        instance_id (int): ID of instance.
+        defaults (:obj:): Data of object if creating or updating.
+        model (Model): Model of instance.
+        user (User): User information associated with request.
+
+    Returns:
+        Model instance.
+    """
+
     try:
-        obj = model.objects.get(id=obj_id)
+        obj = model.objects.get(id=instance_id)
         if obj.creator == user or user.is_staff or user.is_superuser:
             model.objects.filter(id=obj.id).update(**defaults)
             return model.objects.get(id=obj.id)
@@ -39,12 +55,29 @@ def get_or_create_or_update(obj_id, defaults, model, user):
         return model.objects.create(**defaults, creator=user)
 
 
-def map_objects_by_name(name, model, validated_data):
-    data = validated_data.pop(name)
+def map_objects_by_name(field_name, model, validated_data):
+    """Gets or creates model instances from list.
+
+    If instance with name exists, gets instance, otherwise creates new instance.
+
+    Args:
+        field_name (str): Name of field that contains list of data.
+        model (Model): Model of instance.
+        validated_data (:obj:): Validated data from request.
+
+    Returns:
+        List of Model instances.
+    """
+
+    data = validated_data.pop(field_name)
     return list(map(lambda x: model.objects.get_or_create(name=x['name'])[0], data))
 
 
 class RelatedImpressionSerializer(serializers.ModelSerializer):
+    """
+    Minimal Impression serializer that only serializes id and name.
+    """
+
     id = serializers.IntegerField()
     name = serializers.ReadOnlyField()
 
@@ -57,6 +90,10 @@ class RelatedImpressionSerializer(serializers.ModelSerializer):
 
 
 class RelatedSealSerializer(serializers.ModelSerializer):
+    """
+    Minimal Seal serializer that only serializes id and name.
+    """
+
     id = serializers.IntegerField()
     name = serializers.ReadOnlyField()
 
@@ -69,12 +106,20 @@ class RelatedSealSerializer(serializers.ModelSerializer):
 
 
 class ListSealSerializer(serializers.ModelSerializer):
+    """
+    Minimal Seal serializer that only serializes a few fields.
+    """
+
     id = serializers.IntegerField()
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
     name = serializers.ReadOnlyField()
 
     def get_can_edit(self, obj):
+        """
+        Returns boolean specifying whether user from request has edit
+        permissions for the instance.
+        """
         user = self.context['request'].user
         return obj.creator == user or user.is_staff or user.is_superuser
 
@@ -90,6 +135,10 @@ class ListSealSerializer(serializers.ModelSerializer):
 
 
 class SealSerializer(serializers.ModelSerializer):
+    """
+    Detailed Seal serializer that handles creating and updating seals.
+    """
+
     can_edit = serializers.SerializerMethodField()
     creator_username = serializers.ReadOnlyField(source='creator.username')
     creator_id = serializers.ReadOnlyField(source='creator.id')
@@ -111,16 +160,32 @@ class SealSerializer(serializers.ModelSerializer):
     related_seals = RelatedSealSerializer(many=True)
 
     def get_can_edit(self, obj):
+        """
+        Returns boolean specifying whether user from request has edit
+        permissions for the instance.
+        """
         user = self.context['request'].user
         return obj.creator == user or user.is_staff or user.is_superuser
 
     def get_surface_preservation_text(self, obj):
+        """
+        Returns string corresponding to the value of the enum rather than
+        the key for the options.
+        """
         return obj.get_surface_preservation_display()
 
     def get_design_text(self, obj):
+        """
+        Returns string corresponding to the value of the enum rather than
+        the key for the options.
+        """
         return obj.get_design_display()
 
     def validate_related_seals(self, value):
+        """
+        Validates related_seals by ensuring that serializer does not accept
+        a seal listing itself as a related seal.
+        """
         if self.instance is not None:
             for related_seal in value:
                 if self.instance.id == related_seal['id']:
@@ -176,6 +241,13 @@ class SealSerializer(serializers.ModelSerializer):
         model = Seal
 
     def create(self, validated_data):
+        """Overrides default create method.
+
+        Handles list/nested fields with deep serializers like texts.
+        """
+
+        # Uses `map_objects_by_name` for simpler nested fields with only a
+        # `name` field.
         materials = map_objects_by_name(
             'materials', Material, validated_data)
         iconographic_elements = map_objects_by_name(
@@ -191,31 +263,45 @@ class SealSerializer(serializers.ModelSerializer):
         object_types = map_objects_by_name(
             'object_types', ObjectType, validated_data)
 
+        # Since `impressions` and `related_seals` do not expect nested data or
+        # creating new instances, it is sufficient to use `get` over the IDs.
+        impressions = list(map(lambda x: Impression.objects.get(
+            id=x['id']), validated_data.pop('impressions')))
+        related_seals = list(map(lambda x: Seal.objects.get(
+            id=x['id']), validated_data.pop('related_seals')))
+
         user = self.context['request'].user
 
+        # Since `publication` does not have nested ManyToMany fields, it is
+        # sufficient to map `get_or_create` with the other fields.
         publication_data = validated_data.pop('publications')
         publications = list(map(lambda x: Publication.objects.get_or_create(
             id=x['id'],
             defaults={'creator': user, 'title': x['title'], 'author': x.get('author', ''), 'year': x['year'], 'isbn': x['isbn']})[0], publication_data))
 
+        # Since `text` contains a nested ManyToMany field `languages`, it is
+        # necessary to run `map_objects_by_name` on each `text`'s `languages`
+        # field as well.
         text_data = validated_data.pop('texts')
         texts = []
         for text in text_data:
             new_text = Text.objects.get_or_create(
                 id=text['id'],
                 defaults={'creator': user, 'title': text['title'], 'transliteration': text.get('transliteration', ''), 'translation': text.get('translation', '')})[0]
-            text_languages = text['languages']
-            for text_language in text_languages:
-                new_text_language = Language.objects.get_or_create(
-                    name=text_language['name'])[0]
-                new_text.languages.add(new_text_language)
+            new_text.languages.set(
+                map_objects_by_name('languages', Language, text))
             new_text.save()
             texts.append(new_text)
 
+        # Since `images` are meant to be create-only, it maps using `create`
+        # instead of `get_or_create`.
         image_data = validated_data.pop('images')
         images = list(map(lambda x: Image.objects.create(
             **{'creator': user, 'name': x['name'], 'source': x['source'], 'description': x['description'], 's3_key': x['s3_key']}), image_data))
 
+        # Since `historical_relationship` contains a nested many-to-one field
+        # `historical_person`, it is necessary to run `get_or_create_or_update`
+        # on each `historical_relationship`'s `historical_person` field.
         historical_relationships_data = validated_data.pop(
             'historical_relationships')
         historical_relationships = []
@@ -232,12 +318,7 @@ class SealSerializer(serializers.ModelSerializer):
                 creator=user, remarks=historical_relationship_data['remarks'], historical_person=historical_person)
             historical_relationships.append(historical_relationship)
 
-        impressions = list(map(lambda x: Impression.objects.get(
-            id=x['id']), validated_data.pop('impressions')))
-
-        related_seals = list(map(lambda x: Seal.objects.get(
-            id=x['id']), validated_data.pop('related_seals')))
-
+        # Finally creates the Seal instance and sets/saves the nested fields.
         seal = Seal.objects.create(**validated_data)
         seal.materials.set(materials)
         seal.iconographic_elements.set(iconographic_elements)
@@ -256,6 +337,13 @@ class SealSerializer(serializers.ModelSerializer):
         return seal
 
     def update(self, instance, validated_data):
+        """Overrides default update method.
+
+        Handles list/nested fields with deep serializers like texts.
+        """
+
+        # Sets the simple nested fields that do not require deep parsing
+        # or creation.
         instance.materials.set(map_objects_by_name(
             'materials', Material, validated_data))
         instance.iconographic_elements.set(map_objects_by_name(
@@ -277,6 +365,8 @@ class SealSerializer(serializers.ModelSerializer):
 
         user = self.context['request'].user
 
+        # For the more complex nested data, the processes are similar to in the
+        # `create` method, except it also supports updating.
         publication_data = validated_data.pop('publications')
         publications = list(map(lambda x: get_or_create_or_update(
             x['id'],
@@ -346,6 +436,7 @@ class SealSerializer(serializers.ModelSerializer):
             historical_relationships.append(historical_relationship)
         instance.historical_relationships.set(historical_relationships)
 
+        # Updates the Seal instance with the rest of the non-nested fields.
         instance.name = validated_data.get('name', instance.name)
         instance.cdli_number = validated_data.get(
             'cdli_number', instance.cdli_number)

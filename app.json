@@ -1,0 +1,26 @@
+{
+  "name": "Babylonian Seal Collection",
+  "description":
+    "A digital library for recording and displaying seals from the Yale Babylonian Collection.",
+  "repository": "https://github.com/spaceraccoon/babylonian-seal-collection",
+  "keywords": ["node", "python", "django", "react"],
+  "env": {
+    "SECRET_KEY": {
+      "description":
+        "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    },
+    "AWS_ACCESS_KEY": {
+      "description": "AWS Access Key with S3 permissions.",
+      "required": false
+    },
+    "AWS_SECRET_ACCESS_KEY": {
+      "description": "AWS secret access key with S3 permissions.",
+      "required": false
+    },
+    "AWS_STORAGE_BUCKET_NAME": {
+      "description": "S3 storage bucket name.",
+      "required": false
+    }
+  }
+}

@@ -7,6 +7,15 @@ from .permissions import IsCreatorOrAdminOrReadOnly
 
 
 class ImpressionList(generics.ListCreateAPIView):
+    """
+    get:
+    Return a list of all the existing impressions with minimal
+    ListImpressionSerializer.
+
+    post:
+    Create a new impression instance.
+    """
+
     queryset = Impression.objects.all()
     permission_classes = (IsAuthenticatedOrReadOnly,)
     filter_fields = {
@@ -19,10 +28,24 @@ class ImpressionList(generics.ListCreateAPIView):
         return ImpressionSerializer
 
     def perform_create(self, serializer):
+        """
+        Saves the request's user as the creator.
+        """
         serializer.save(creator=self.request.user)
 
 
 class ImpressionDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    get:
+    Return the given impression.
+
+    patch:
+    Update the given impression.
+
+    delete:
+    Delete the given impression.
+    """
+
     queryset = Impression.objects.all()
     serializer_class = ImpressionSerializer
     permission_classes = (IsCreatorOrAdminOrReadOnly,)
