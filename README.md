@@ -2,7 +2,7 @@
 
 ## Introduction
 
-A digital library for recording and displaying seals from the Yale Babylonian Collection. It is built on Django REST Framework (backend) and React (frontend).
+A digital library for recording and displaying seals from the Yale Babylonian Collection. It is built on Django REST Framework (backend) and React (frontend). A Yale Computer Science Senior Project.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ A digital library for recording and displaying seals from the Yale Babylonian Co
 6.  After initial installation, you can start development by running `pipenv shell` then `python manage.py runserver` in one terminal and `cd frontend` and `yarn start` in another.
 7.  To create an admin user, run `python manage.py createsuperuser` (Remember to run `pipenv shell` before).
 
-# Deploy
+## Deploy
 
 Heroku deploy button:
 
