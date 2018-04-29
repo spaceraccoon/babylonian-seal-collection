@@ -1,3 +1,7 @@
+/**
+ * Specifies the structure and fields of nested items.
+ */
+
 import isISBN from 'validator/lib/isISBN';
 
 import {

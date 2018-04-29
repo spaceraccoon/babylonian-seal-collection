@@ -1,3 +1,7 @@
+/**
+ * Hashes the string to a CSS string specifying HSL color values.
+ * @param {*} str
+ */
 const stringToColour = str => {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {

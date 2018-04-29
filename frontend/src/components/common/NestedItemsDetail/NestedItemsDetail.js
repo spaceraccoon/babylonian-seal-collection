@@ -10,6 +10,9 @@ import ImageDetail from '../ImageDetail/ImageDetail';
 
 const { Panel } = Collapse;
 
+/**
+ * Displays multiple nested field data.
+ */
 class NestedItemsDetail extends Component {
   render() {
     return (

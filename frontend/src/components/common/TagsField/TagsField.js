@@ -7,6 +7,10 @@ import { tagsFieldRules } from '../../../data/fieldRules';
 const FormItem = Form.Item;
 const { Option } = Select;
 
+/**
+ * Form field for multi-tag (ManyToMany) data. Allows the user to create new
+ * nested options with a single field like name.
+ */
 class TagsField extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;

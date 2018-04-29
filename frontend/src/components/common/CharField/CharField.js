@@ -6,8 +6,12 @@ import {
   charFieldRules,
   requiredCharFieldRules,
 } from '../../../data/fieldRules';
+
 const FormItem = Form.Item;
 
+/**
+ * Form field for CharField data.
+ */
 class CharField extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;

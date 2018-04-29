@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 import DetailRow from '../DetailRow/DetailRow';
 import stringToColor from '../../../utils/stringToColor';
 
+/**
+ * Displays multiple tags and assigns a hashed color.
+ */
 class TagsDetail extends Component {
   render() {
     return (

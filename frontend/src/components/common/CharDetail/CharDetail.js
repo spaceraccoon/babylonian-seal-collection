@@ -3,7 +3,10 @@ import Moment from 'react-moment';
 
 import DetailRow from '../DetailRow/DetailRow';
 
-class CharField extends Component {
+/**
+ * Displays CharField data.
+ */
+class CharDetail extends Component {
   render() {
     return (
       <DetailRow nested={this.props.nested} label={this.props.label}>
@@ -17,4 +20,4 @@ class CharField extends Component {
   }
 }
 
-export default CharField;
+export default CharDetail;

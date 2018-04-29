@@ -6,6 +6,9 @@ import { numberRules } from '../../../data/fieldRules';
 
 const FormItem = Form.Item;
 
+/**
+ * Form field for FloatField data.
+ */
 class FloatField extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;

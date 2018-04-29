@@ -2,7 +2,12 @@ import React, { Component, Fragment } from 'react';
 import _ from 'lodash';
 import { Button, Form, Input, message, Radio, Select, Spin } from 'antd';
 import { Redirect, Link } from 'react-router-dom';
-import './SealForm.css';
+
+import {
+  createResource,
+  fetchResources,
+  updateResource,
+} from '../../../api/resourceApi';
 import CharField from '../CharField/CharField';
 import FloatField from '../FloatField/FloatField';
 import TagsField from '../TagsField/TagsField';
@@ -18,17 +23,35 @@ import {
   imageFields,
   historicalRelationshipFields,
 } from '../../../data/itemFields';
-import {
-  createResource,
-  fetchResources,
-  updateResource,
-} from '../../../api/resourceApi';
+import './SealForm.css';
 
 const { Option } = Select;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
+/**
+ * Maps the field to an array of values. While the API sends an array of
+ * objects for ManyToMany fields, the Select component only accepts an array of
+ * strings or numbers, so it is necessary to map it accordingly. See
+ * https://github.com/ant-design/ant-design/issues/5670 for more details.
+ * @param {!Array<Object>} field An array of objects.
+ * @param {string} property The property of the object to extract.
+ * @return {!Array<string|number>}
+ */
+const mapPropertyToFormField = (field, property) =>
+  Form.createFormField({
+    value: field.map(item => _.get(item, property)),
+  });
+
+/**
+ * Since the API only accepts an array of objects for ManyToMany fields, it is
+ * necessary to map back the form fields from an array of strings or numbers to
+ * an array of objects before sending it to the API.
+ * @param {!Array<string|number>} field
+ * @param {string} property The property of the object to insert.
+ * @return {!Array<Object>}
+ */
 const mapPropertyToObject = (propertyArray, property) =>
   propertyArray.map(propertyItem => {
     return {
@@ -36,11 +59,14 @@ const mapPropertyToObject = (propertyArray, property) =>
     };
   });
 
-const mapPropertyToFormField = (field, property) =>
-  Form.createFormField({
-    value: field.map(item => _.get(item, property)),
-  });
-
+/**
+ * For ManyToMany API fields with nested ManyToMany fields, it is necessary to
+ * remap the nested fields to either an array of the values of a property or
+ * null if the field does not exist.
+ * @param {!Array<Object>} field An array of objects with a nested field.
+ * @param {string} nestedItemKey The nested ManyToMany field that must be
+ * extracted.
+ */
 const remapNestedItems = (field, nestedItemKey) =>
   field.map(nestedItem => {
     return {
@@ -51,6 +77,13 @@ const remapNestedItems = (field, nestedItemKey) =>
     };
   });
 
+/**
+ * Since the historical relationships form field nests the historical
+ * person form fields, and these models are separate in the backend, it is
+ * necessary to map the list of historical persons (which is being used for the
+ * options) from the API into historical relationship objects to fit the
+ * historical relationship form field.
+ */
 const mapHistoricalPersonOptions = async () => {
   let historicalPersons = await fetchResources('historicalperson');
   return historicalPersons.map(historical_person => {
@@ -60,6 +93,11 @@ const mapHistoricalPersonOptions = async () => {
   });
 };
 
+/**
+ * Seal form component that prepopulates the fields with the existing seal data
+ * if available. Uses the antd form wrapper to capture the data for sending
+ * to the API; see https://ant.design/components/form/.
+ */
 class SealForm extends Component {
   state = {
     isLoading: true,
@@ -79,6 +117,10 @@ class SealForm extends Component {
     seals: [],
   };
 
+  /**
+   * Sends form data to the relevant API on successful validation, remapping
+   * as necessary.
+   */
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields(async (err, values) => {
@@ -124,6 +166,9 @@ class SealForm extends Component {
     });
   };
 
+  /**
+   * Initialize state with options for select fields.
+   */
   async componentDidMount() {
     this.setState({
       materials: await fetchResources('material'),
@@ -399,6 +444,10 @@ class SealForm extends Component {
   }
 }
 
+/**
+ * Wraps form to colelct and validate data automatically, remapping as
+ * necessary.
+ */
 const WrappedSealForm = Form.create({
   mapPropsToFields(props) {
     if (props.seal) {

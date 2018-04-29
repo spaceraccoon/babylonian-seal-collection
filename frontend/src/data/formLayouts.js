@@ -1,3 +1,8 @@
+/**
+ * Different form item layouts. See
+ * https://ant.design/components/form/#Form.Item.
+ */
+
 const formItemLayout = {
   labelCol: {
     xs: { span: 24 },

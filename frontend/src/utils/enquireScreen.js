@@ -1,4 +1,8 @@
-// from https://github.com/ant-design/ant-design-pro-site/blob/master/site/theme/template/utils.jsx
+/**
+ * https://github.com/ant-design/ant-design-pro-site/blob/master/site/theme/template/utils.jsx
+ * Listens for media queries with a callback handler for responsiveness.
+ * See https://www.npmjs.com/package/enquire.js.
+ */
 
 let enquireJs;
 if (typeof window !== 'undefined') {

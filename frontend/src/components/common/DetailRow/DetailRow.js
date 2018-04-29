@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Col, Row } from 'antd';
 
+/**
+ * Container row for detail data.
+ */
 class DetailRow extends Component {
   render() {
     return (

@@ -12,17 +12,25 @@ import {
 import axios from 'axios';
 import _ from 'lodash';
 
+import { fetchSignedUrl } from '../../../../../api/uploadApi';
 import {
   formItemLayoutWithoutLabel,
   nestedFormItemLayout,
 } from '../../../../../data/formLayouts';
-import { fetchSignedUrl } from '../../../../../api/uploadApi';
 
 const { Option } = Select;
 const { Panel } = Collapse;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 
+/**
+ * Check if the field of a nested item can be edited by checking the edit
+ * permissions of the direct parent . E.g. for the historical_person.name field
+ * of a historical_relationship, it checks can_edit of historical_person rather
+ * than historical_relationship.
+ * @param {!Object} item
+ * @param {string} field
+ */
 const canEdit = (item, field) => {
   let parentKey = field
     .split('.')
@@ -32,6 +40,10 @@ const canEdit = (item, field) => {
   return _.get(item, canEditPath, true);
 };
 
+/**
+ * Nested field component that displays the corresponding field type for a
+ * nested item.
+ */
 class NestedItem extends Component {
   render() {
     const {
@@ -40,6 +52,9 @@ class NestedItem extends Component {
       setFieldsValue,
     } = this.props.form;
 
+    /**
+     * Check if item is a new or existing option.
+     */
     const isExistingItem = _.has(this.props.item, 'id');
 
     return (
@@ -61,6 +76,11 @@ class NestedItem extends Component {
           >
             {this.props.itemFields.map(itemField => {
               switch (itemField.type) {
+                /**
+                 * Since id should not be changed but must be submitted to the
+                 * API when updating resources, it is included as a hidden
+                 * input.
+                 */
                 case 'id':
                   return (
                     <FormItem key={itemField.field}>

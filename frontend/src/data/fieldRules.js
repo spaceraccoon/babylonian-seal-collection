@@ -1,3 +1,8 @@
+/**
+ * Validation rules for different types of form fields. See
+ * https://ant.design/components/form/#Validation-Rules.
+ */
+
 import _ from 'lodash';
 
 const charFieldRules = {

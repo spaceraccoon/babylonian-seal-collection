@@ -12,7 +12,15 @@ import NestedItem from './components/NestedItem/NestedItem';
 const { Option } = Select;
 const FormItem = Form.Item;
 
+/**
+ * Form field component that displays multiple nested fields and allows the
+ * user to add or remove nested items.
+ */
 class NestedItemsField extends Component {
+  /**
+   * Initialize items state from initialItems prop.
+   * @param {!Object} props
+   */
   constructor(props) {
     super(props);
     this.state = {
@@ -21,15 +29,26 @@ class NestedItemsField extends Component {
     };
   }
 
+  /**
+   * Remove selected item from state.
+   */
   removeItem = index => {
     this.setState({
       items: this.state.items.filter((item, i) => index !== i),
     });
   };
 
+  /**
+   * Adds an item to state. Adds option data if selecting an existing option or
+   * adds blank data if creating a new item.
+   */
   addItem = (value, option) => {
     if (option) {
-      // check if item has already been added
+      /**
+       * Check if option has already been added. historical_relationships
+       * is excused because you are adding historical person data, which
+       * can be duplicated across different historical_relationships.
+       */
       if (
         !_.find(this.state.items, function(item) {
           return item.id === option.props.item.id;
@@ -48,6 +67,11 @@ class NestedItemsField extends Component {
   };
 
   render() {
+    /**
+     * Maps selected items state to NestedItem components, passing the item data
+     * and form fields. Checks whether the specified field to extract header
+     * text is avilable, otherwise passes down default text.
+     */
     const items = this.state.items.map((item, index) => {
       return (
         <NestedItem
@@ -55,7 +79,6 @@ class NestedItemsField extends Component {
           form={this.props.form}
           headerText={
             _.get(this.state.items[index], this.props.nestedItemLabel) ||
-            this.state.items[index][this.props.nestedItemLabel] ||
             `New ${pluralize.singular(this.props.label)}`
           }
           item={item}
@@ -79,9 +102,17 @@ class NestedItemsField extends Component {
             <Select
               showSearch
               onSelect={this.addItem}
+              /**
+               * In the case of historical_relationships field, the options
+               * come from historical_persons instead, so it uses the
+               * searchLabel prop.
+               */
               placeholder={`Search for an existing ${pluralize
                 .singular(this.props.searchLabel || this.props.label)
                 .toLowerCase()}`}
+              /**
+               * Filters every property of the option, not just name.
+               */
               filterOption={(input, option) =>
                 _.some(option.props.item, value => {
                   return (

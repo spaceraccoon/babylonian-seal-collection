@@ -6,6 +6,10 @@ import { formItemLayout } from '../../../data/formLayouts';
 const FormItem = Form.Item;
 const { Option } = Select;
 
+/**
+ * Form field for multi-select (ManyToMany) data. Unlike the TagsField
+ * component, it does not allow the creation of new nested objects/options.
+ */
 class MultiSelectField extends Component {
   render() {
     const { getFieldDecorator } = this.props.form;
@@ -21,6 +25,10 @@ class MultiSelectField extends Component {
               <Option
                 key={option.id}
                 value={option.id}
+                /**
+                 * In cases like related_seals, a seal should not be able to
+                 * select itself as a related seal.
+                 */
                 disabled={
                   this.props.excludeSelf && option.id === this.props.excludeSelf
                 }
